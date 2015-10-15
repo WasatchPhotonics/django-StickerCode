@@ -1,0 +1,14 @@
+language: python
+python:
+  - "2.7"
+before_install:
+  - cd ..
+  - git clone git://github.com/WasatchPhotonics/pyqrnative.git
+  - python setup.py install
+# command to install dependencies
+install:
+  - pip install coveralls
+  - "python setup.py develop"
+# command to run tests
+script: nosetests --cover-erase --with-coverage --cover-package=stickercode
+after_success: coveralls
