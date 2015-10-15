@@ -8,7 +8,7 @@ class QL700Label(object):
     """ Generate a Wasatch Photonics themed Brother QL-700 label by
     default. All parameters are optional.
     """
-    def __init__(self, filename="ql700_label.png", serial="EXAMPLE",
+    def __init__(self, filename="ql700_label.png", serial="EXAM012",
                  domain="https://waspho.com", 
                  base_img="resources/wasatch.png"):
         self.filename = filename
