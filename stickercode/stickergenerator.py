@@ -2,7 +2,7 @@
 design for wasatch photonics device labeling.
 """
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 class QL700Label(object):
     """ Generate a Wasatch Photonics themed Brother QL-700 label by
@@ -46,9 +46,13 @@ class QL700Label(object):
         # Open the base image, draw text
         link_txt = "%s/%s" % (self.domain, self.serial)
         back_img = Image.open(self.base_img)
+
+
+
         txt_draw = ImageDraw.Draw(back_img)
 
-        txt_draw.text((10, 260), link_txt)
+        font = ImageFont.truetype("LiberationMono-Regular.ttf", 30)
+        txt_draw.text((140, 205), link_txt, font = font)
 
         back_img.save(self.filename)
 
