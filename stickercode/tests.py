@@ -7,10 +7,12 @@ import sys
 import logging
 import unittest
 
+from pyramid import testing
+
 from stickercode.coverage_utils import touch_erase
 
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 strm = logging.StreamHandler(sys.stderr)
 frmt = logging.Formatter("%(name)s - %(levelname)s %(message)s")
@@ -27,5 +29,23 @@ class TestStickerGenerator(unittest.TestCase):
         actual_size = os.path.getsize(filename)
         self.assertEqual(actual_size, 15858)
 
+class TestStickerCodeViews(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_get_returns_empty_form(self):
+        from stickercode.views import LabelViews
+
+        request = testing.DummyRequest()
+        inst = LabelViews(request)
+        result = inst.qr_label()
+
+        fields = result["fields"]
+
+        self.assertEqual(fields.serial, "changetonull")
+        
 if __name__ == "__main__":
     unittest.main()

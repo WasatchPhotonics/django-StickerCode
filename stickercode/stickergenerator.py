@@ -46,6 +46,7 @@ class QL700Label(object):
         pyqr.make()
         qr_image = pyqr.makeImage()
 
+        # Resize the image so it first nicely on the graphic
         img_file = open("resources/temp_qr.png", "wb")
         qr_image = qr_image.resize((320, 320))
         qr_image.save(img_file, 'PNG')
@@ -58,18 +59,12 @@ class QL700Label(object):
 
         # Open the base image, draw text
         back_img = Image.open(self.base_img)
-
         txt_draw = ImageDraw.Draw(back_img)
-
         font = ImageFont.truetype(self.font, 30)
         txt_draw.text((140, 205), self.link_txt, font = font)
-
 
         # Composite over the generated qr code
         qr_img = Image.open("resources/temp_qr.png")
         back_img.paste(qr_img, (730, 0))
 
         back_img.save(self.filename)
-
-        
-    
