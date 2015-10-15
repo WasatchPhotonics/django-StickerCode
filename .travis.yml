@@ -4,6 +4,7 @@ python:
 before_install:
   - cd ..
   - git clone git://github.com/WasatchPhotonics/pyqrnative.git
+  - cd pyqrnative
   - python setup.py install
 # command to install dependencies
 install:
