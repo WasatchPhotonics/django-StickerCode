@@ -22,7 +22,7 @@ requires = [
     "requests",
     "python-slugify",
     "PyQRNative",
-    "PIL",
+    "pillow",
     ]
 
 setup(name="stickercode",
