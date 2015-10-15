@@ -25,7 +25,7 @@ class TestStickerGenerator(unittest.TestCase):
 
         lbl = QL700Label()
         actual_size = os.path.getsize(filename)
-        #self.assertEqual(actual_size, 32743)
+        self.assertEqual(actual_size, 15858)
 
 if __name__ == "__main__":
     unittest.main()

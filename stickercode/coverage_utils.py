@@ -13,7 +13,4 @@ def touch_erase(filename):
     if os.path.exists(filename):
         os.remove(filename)
 
-    if os.path.exists(filename):
-        return True
-
-    return False
+    return os.path.exists(filename)
