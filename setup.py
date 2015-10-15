@@ -21,8 +21,6 @@ requires = [
     "WebTest",
     "requests",
     "python-slugify",
-    "wand",
-    "reportlab",
     ]
 
 setup(name="stickercode",
