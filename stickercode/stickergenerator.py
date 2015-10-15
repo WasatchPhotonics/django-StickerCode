@@ -23,6 +23,8 @@ class QL700Label(object):
         self.base_img = base_img
         self.link_txt = "%s/%s" % (self.domain, self.serial)
 
+        self.font = "resources/libmonoreg.ttf"
+
         min_length = 4
         max_length = 34
         link_len = len(self.link_txt)
@@ -59,7 +61,7 @@ class QL700Label(object):
 
         txt_draw = ImageDraw.Draw(back_img)
 
-        font = ImageFont.truetype("LiberationMono-Regular.ttf", 30)
+        font = ImageFont.truetype(self.font, 30)
         txt_draw.text((140, 205), self.link_txt, font = font)
 
 
