@@ -8,6 +8,8 @@ before_install:
   - python setup.py install
 # command to install dependencies
 install:
+  - cd ..
+  - cd StickerCode
   - pip install coveralls
   - "python setup.py develop"
 # command to run tests
