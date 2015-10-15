@@ -1,4 +1,6 @@
 # StickerCode
+[![Build Status](https://travis-ci.org/WasatchPhotonics/StickerCode.svg?branch=master)](https://travis-ci.org/WasatchPhotonics/StickerCode) [![Coverage Status](https://coveralls.io/repos/WasatchPhotonics/StickerCode/badge.svg?branch=master&service=github)](https://coveralls.io/github/WasatchPhotonics/StickerCode?branch=master)
+
 Web service to create qr codes, short links and QL-700 shaped stickers
 for device serialization.
 
