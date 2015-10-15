@@ -21,6 +21,7 @@ requires = [
     "WebTest",
     "requests",
     "python-slugify",
+    "PyQRNative"
     ]
 
 setup(name="stickercode",

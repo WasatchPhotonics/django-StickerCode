@@ -2,22 +2,34 @@
 design for wasatch photonics device labeling.
 """
 
+import logging
+
+import PyQRNative
+
 from PIL import Image, ImageDraw, ImageFont
+
+log = logging.getLogger(__name__)
 
 class QL700Label(object):
     """ Generate a Wasatch Photonics themed Brother QL-700 label by
     default. All parameters are optional.
     """
-    def __init__(self, filename="ql700_label.png", serial="EXAM012",
+    def __init__(self, filename="ql700_label.png", serial="EXAM0123",
                  domain="https://waspho.com", 
                  base_img="resources/wasatch.png"):
         self.filename = filename
         self.serial = serial
         self.domain = domain
         self.base_img = base_img
+        self.link_txt = "%s/%s" % (self.domain, self.serial)
 
-        if len(serial) < 4 or len(serial) > 20:
-            log.critical("Invalid serial length")
+        min_length = 4
+        max_length = 34
+        link_len = len(self.link_txt)
+
+        log.info("Encode: %s (%s)", self.link_txt, link_len)
+        if link_len < min_length or link_len > max_length:
+            log.critical("Invalid length")
             raise TypeError
 
         self.generate_qr_image()
@@ -26,15 +38,15 @@ class QL700Label(object):
     def generate_qr_image(self):
         """ Use pyqrnative to build a qr image, and save to disk.
         """
-        return
-        qr = PyQRNative.QRCode(4, PyQRNative.QRErrorCorrectLevel.H)
-        qr.addData(in_url)
-        qr.make()
-        im = qr.makeImage()
+        pyqr = PyQRNative.QRCode(4, PyQRNative.QRErrorCorrectLevel.H)
+        
+        pyqr.addData(self.link_txt)
+        pyqr.make()
+        qr_image = pyqr.makeImage()
 
-        img_file = open('imagery\qr_resize.png', 'wb')
-        im = im.resize((300,300))
-        im.save(img_file, 'PNG')
+        img_file = open("resources/temp_qr.png", "wb")
+        qr_image = qr_image.resize((320, 320))
+        qr_image.save(img_file, 'PNG')
         img_file.close()
 
     def build_png(self):
@@ -42,17 +54,18 @@ class QL700Label(object):
         pillow suitable for printing at 300x600 on brother ql700.
         """
 
-        
         # Open the base image, draw text
-        link_txt = "%s/%s" % (self.domain, self.serial)
         back_img = Image.open(self.base_img)
-
-
 
         txt_draw = ImageDraw.Draw(back_img)
 
         font = ImageFont.truetype("LiberationMono-Regular.ttf", 30)
-        txt_draw.text((140, 205), link_txt, font = font)
+        txt_draw.text((140, 205), self.link_txt, font = font)
+
+
+        # Composite over the generated qr code
+        qr_img = Image.open("resources/temp_qr.png")
+        back_img.paste(qr_img, (730, 0))
 
         back_img.save(self.filename)
 
