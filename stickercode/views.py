@@ -55,6 +55,7 @@ class LabelViews(object):
             except ValidationFailure as e:
                 log.exception(e)
                 log.critical("Validation failure, return empty form")
+                return dict(data=local_data, form=e.render())
 
         return dict(data=local_data, form=form.render())
 

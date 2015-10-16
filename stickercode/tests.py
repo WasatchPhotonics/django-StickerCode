@@ -31,6 +31,17 @@ class TestStickerGenerator(unittest.TestCase):
         actual_size = os.path.getsize(filename)
         self.assertEqual(actual_size, 15858)
 
+    def test_length_within_range(self):
+        from stickercode.stickergenerator import QL700Label
+        filename = "dontexist.png"
+        touch_erase(filename)
+
+        fail_domain = "superlongdomainnametotriggerfailures"
+        self.assertRaises(TypeError, QL700Label, domain=fail_domain)
+
+        fail_serial = "aserialnumberthatiswaytoolongtotriggerfailures"
+        self.assertRaises(TypeError, QL700Label, serial=fail_serial)
+
 class TestStickerCodeViews(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -54,6 +65,18 @@ class TestStickerCodeViews(unittest.TestCase):
   
         test_serial = "FT1234" 
         new_dict = {"submit":"True", "serial":test_serial} 
+        request = testing.DummyRequest(new_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+
+        data = result["data"]
+        self.assertEqual(data.serial, test_serial)
+
+    def test_post_invalid_data(self):
+        from stickercode.views import LabelViews
+
+        test_serial = ""
+        new_dict = {"submit":"True", "serial":test_serial}
         request = testing.DummyRequest(new_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
