@@ -114,7 +114,3 @@ class FunctionalTests(unittest.TestCase):
         #log.info("post submit: %s", submit_res)
         new_form = submit_res.forms["deform"]
         self.assertEqual(new_form["serial"].value, ft_serial)
-
- 
-if __name__ == "__main__":
-    unittest.main()
