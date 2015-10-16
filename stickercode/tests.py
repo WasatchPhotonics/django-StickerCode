@@ -45,18 +45,22 @@ class TestStickerCodeViews(unittest.TestCase):
         inst = LabelViews(request)
         result = inst.qr_label()
 
-        fields = result["fields"]
+        data = result["data"]
 
-        self.assertEqual(fields.serial, "changetonull")
+        self.assertEqual(data.serial, "")
 
-    def test_deform_display(self):
+    def test_post_returns_populated_data(self):
         from stickercode.views import LabelViews
-        request = testing.DummyRequest()
+  
+        test_serial = "FT1234" 
+        new_dict = {"submit":"True", "serial":test_serial} 
+        request = testing.DummyRequest(new_dict)
         inst = LabelViews(request)
-        result = inst.deform_view()
+        result = inst.qr_label()
 
-        appstruct = result["appstruct"]
-        self.assertEqual(appstruct.serial, "deformnull")
+        data = result["data"]
+        self.assertEqual(data.serial, test_serial)
+
        
 class FunctionalTests(unittest.TestCase):
     def setUp(self):
@@ -68,16 +72,25 @@ class FunctionalTests(unittest.TestCase):
     def tearDown(self):
         del self.testapp
 
-    def test_deform_display_not_submitted(self):
-        res = self.testapp.get("/deform_view")
-        log.info("deform res: %s", res)
+    def test_get_form_view(self):
+        res = self.testapp.get("/qr_label")
+        #log.info("label form res: %s", res)
         self.assertEqual(res.status_code, 200)
 
         form = res.forms["deform"]
-        self.assertTrue(form["serial"].value, "deformnull")
+        self.assertEqual(form["serial"].value, "")
 
-    def test_deform_display_bad_submit(self):
-        res = self.testapp.get("/deform_view")
+    def test_post_form_returns_populated_data(self):
+        ft_serial = "FT7890"
+
+        res = self.testapp.get("/qr_label")
+        form = res.forms["deform"]
+        form["serial"] = ft_serial
+
+        submit_res = form.submit("submit")
+        #log.info("post submit: %s", submit_res)
+        new_form = submit_res.forms["deform"]
+        self.assertEqual(new_form["serial"].value, ft_serial)
 
  
 if __name__ == "__main__":

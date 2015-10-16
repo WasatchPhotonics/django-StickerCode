@@ -1,32 +1,26 @@
 """ pyramid web views for stickercode label creation.
 """
 
+import logging
 import colander
+        
+from deform import Form
+from deform.exception import ValidationFailure
 
 from pyramid.view import view_config
+
+log = logging.getLogger(__name__)
 
 class StickerSchema(colander.Schema):
     """ use colander to define a data validation schema for linkage with
     a deform object.
     """
     serial = colander.SchemaNode(colander.String(),
-                default="defaultnull",
                 description="Non empty serial")
-
-class Person(colander.MappingSchema):
-    name = colander.SchemaNode(colander.String())
-    age = colander.SchemaNode(colander.Integer(),
-                              validator=colander.Range(0, 200))
-
-class People(colander.SequenceSchema):
-    person = Person()
-
-class Schema(colander.MappingSchema):
-    people = People()
 
 
 class StickerForm(object):
-    serial = "changetonull"
+    serial = ""
 
 class LabelViews(object):
     """ Return forms and png objects for post generated content.
@@ -34,40 +28,49 @@ class LabelViews(object):
     def __init__(self, request):
         self.request = request
 
+    @view_config(route_name="qr_label", renderer="templates/home.pt")
     def qr_label(self):
         """ Process form parameters, create a qr code or return an empty
         form.
         """
-        if "form.submitted" not in self.request.params:
-            return dict(fields=self.empty_form())
+
+        schema = StickerSchema()
+        form = Form(schema, buttons=("submit",))
+        local_data = self.empty_form()    
+
+        log.info("in form submitted %s", self.request.POST)
+        if "submit" in self.request.POST:
+            try:
+                # Deserialize into hash on validation - capture is the
+                # appstruct in deform land
+                controls = self.request.POST.items()
+                captured = form.validate(controls)
+
+                # Populate local data structure with deserialized data
+                local_data.serial = captured["serial"]
+              
+                # Re-render the form with the fields already populated 
+                return dict(data=local_data, form=form.render(captured))
+                
+            except ValidationFailure as e:
+                log.exception(e)
+                log.critical("Validation failure, return empty form")
+
+        return dict(data=local_data, form=form.render())
 
     def empty_form(self):
         """ Populate an empty form object, return to web app.
         """
         return StickerForm()
 
-    @view_config(route_name="deform_view", renderer="templates/home.pt")
-    def deform_view(self):
-        from deform import Form
-        schema = Schema()
-        myform = Form(schema, buttons=('submit',))
+    #@view_config(route_name="deform_view", renderer="templates/home.pt")
+    #def deform_view(self):
+        #schema = Schema()
+        #myform = Form(schema, buttons=('submit',))
 
-        appstruct = self.empty_form()
-        appstruct.serial = "deformnull"
+        #appstruct = self.empty_form()
+        #appstruct.serial = "deformnull"
 
-        class TestSchema(colander.Schema):
-            artist = colander.SchemaNode(
-                colander.String(),
-                default='Grandaddy',
-                description='Song name')
-            album = colander.SchemaNode(
-                colander.String(),
-                default='Just Like the Fambly Cat')
-            song = colander.SchemaNode(
-                colander.String(),
-                description='Song name')
-
-        schema = StickerSchema()
-        form = Form(schema, buttons=('submit',))
-        return dict(form=form, appstruct=appstruct)
-        return dict(form=myform.render(), appstruct=appstruct)
+        #schema = StickerSchema()
+        #form = Form(schema, buttons=('submit',))
+        #return dict(form=form, appstruct=appstruct)

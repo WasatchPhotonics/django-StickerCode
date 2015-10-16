@@ -23,6 +23,7 @@ requires = [
     "python-slugify",
     "PyQRNative",
     "pillow",
+    "deform",
     ]
 
 setup(name="stickercode",
