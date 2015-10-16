@@ -14,7 +14,7 @@ class QL700Label(object):
     """ Generate a Wasatch Photonics themed Brother QL-700 label by
     default. All parameters are optional.
     """
-    def __init__(self, filename="ql700_label.png", serial="EXAM0123",
+    def __init__(self, filename="ql700_label.png", serial="EX-0158",
                  domain="https://waspho.com", 
                  base_img="resources/wasatch.png"):
         self.filename = filename
@@ -23,7 +23,9 @@ class QL700Label(object):
         self.base_img = base_img
         self.link_txt = "%s/%s" % (self.domain, self.serial)
 
-        self.font = "resources/libmonoreg.ttf"
+        self.font_sans = "resources/libsansreg.ttf"
+        self.font_reg = "resources/libmonoreg.ttf"
+        self.font_bold = "resources/libmonobold.ttf"
 
         min_length = 4
         max_length = 33
@@ -60,8 +62,13 @@ class QL700Label(object):
         # Open the base image, draw text
         back_img = Image.open(self.base_img)
         txt_draw = ImageDraw.Draw(back_img)
-        font = ImageFont.truetype(self.font, 30)
-        txt_draw.text((140, 205), self.link_txt, font = font)
+        font = ImageFont.truetype(self.font_sans, 30)
+
+        dtxt = "%s/" % self.domain
+        txt_draw.text((145, 205), dtxt, font = font)
+
+        bold_font = ImageFont.truetype(self.font_bold, 40)
+        txt_draw.text((410, 198), self.serial, font=bold_font)
 
         # Composite over the generated qr code
         qr_img = Image.open("resources/temp_qr.png")

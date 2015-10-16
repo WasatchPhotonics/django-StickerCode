@@ -32,7 +32,7 @@ class TestStickerGenerator(unittest.TestCase):
 
         lbl = QL700Label()
         actual_size = os.path.getsize(filename)
-        self.assertEqual(actual_size, 15858)
+        self.assertEqual(actual_size, 16098)
 
     def test_length_within_range(self):
         from stickercode.stickergenerator import QL700Label
@@ -165,14 +165,14 @@ class TestStickerCodeViews(unittest.TestCase):
         slug_serial = slugify(test_serial)
         dest_file = "database/%s/label.png" % slug_serial
         self.assertTrue(os.path.exists(dest_file))
-        self.assertEqual(os.path.getsize(dest_file), 15079)
+        self.assertEqual(os.path.getsize(dest_file), 15337)
 
         # verify the view returns it
         request = testing.DummyRequest()
         request.matchdict["serial"] = test_serial
         inst = LabelViews(request)
         result = inst.show_label()
-        self.assertEqual(result.content_length, 15079)
+        self.assertEqual(result.content_length, 15337)
         
  
 class FunctionalTests(unittest.TestCase):
