@@ -55,19 +55,6 @@ class TestStickerCodeViews(unittest.TestCase):
         inst = LabelViews(request)
         result = inst.deform_view()
 
-        
-        # deserialize the form data to an appstruct, then do the
-        # dictionary lookup. No that doesn't make sense because it's a
-        # form not a data object. To use this appropriately, you need to
-        # return the form rendered to the functional view only. the unit
-        # test discards it. The unit test here looks at the appstruct
-        # field which is the data that is loaded by default, or submitted
-        # by post
-
-        # The form is just rendered html for functional test
-        #form = result["form"]
-        #log.info("Full form: %s", form)
-
         appstruct = result["appstruct"]
         self.assertEqual(appstruct.serial, "deformnull")
        
@@ -83,9 +70,14 @@ class FunctionalTests(unittest.TestCase):
 
     def test_deform_display_not_submitted(self):
         res = self.testapp.get("/deform_view")
-        log.info("Root res: %s", res)
+        log.info("deform res: %s", res)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("deformnull" in res.body)
+
+        form = res.forms["deform"]
+        self.assertTrue(form["serial"].value, "deformnull")
+
+    def test_deform_display_bad_submit(self):
+        res = self.testapp.get("/deform_view")
 
  
 if __name__ == "__main__":

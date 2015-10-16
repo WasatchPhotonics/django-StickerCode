@@ -5,6 +5,14 @@ import colander
 
 from pyramid.view import view_config
 
+class StickerSchema(colander.Schema):
+    """ use colander to define a data validation schema for linkage with
+    a deform object.
+    """
+    serial = colander.SchemaNode(colander.String(),
+                default="defaultnull",
+                description="Non empty serial")
+
 class Person(colander.MappingSchema):
     name = colander.SchemaNode(colander.String())
     age = colander.SchemaNode(colander.Integer(),
@@ -47,4 +55,19 @@ class LabelViews(object):
         appstruct = self.empty_form()
         appstruct.serial = "deformnull"
 
+        class TestSchema(colander.Schema):
+            artist = colander.SchemaNode(
+                colander.String(),
+                default='Grandaddy',
+                description='Song name')
+            album = colander.SchemaNode(
+                colander.String(),
+                default='Just Like the Fambly Cat')
+            song = colander.SchemaNode(
+                colander.String(),
+                description='Song name')
+
+        schema = StickerSchema()
+        form = Form(schema, buttons=('submit',))
+        return dict(form=form, appstruct=appstruct)
         return dict(form=myform.render(), appstruct=appstruct)
