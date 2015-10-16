@@ -26,7 +26,7 @@ class QL700Label(object):
         self.font = "resources/libmonoreg.ttf"
 
         min_length = 4
-        max_length = 34
+        max_length = 33
         link_len = len(self.link_txt)
 
         log.info("Encode: %s (%s)", self.link_txt, link_len)

@@ -12,6 +12,7 @@ def main(global_config, **settings):
     config.add_static_view("static", "static", cache_max_age=3600)
     config.add_route("cal_report", "/")
     config.add_route("qr_label", "/qr_label")
-    config.add_route("view_thumbnail", "/view_thumbnail/{serial}")
+    config.add_route("show_label", "/show_label/{serial}")
+    config.add_route("blank_label", "/show_label/")
     config.scan()
     return config.make_wsgi_app()

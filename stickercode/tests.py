@@ -75,8 +75,6 @@ class TestStickerCodeViews(unittest.TestCase):
         data = result["data"]
         self.assertEqual(data.serial, "")
 
-        #links = result["links"]
-        #self.assertEqual(links.label_img, "default_image.png") 
 
     def test_post_returns_populated_data(self):
         from stickercode.views import LabelViews
@@ -101,6 +99,17 @@ class TestStickerCodeViews(unittest.TestCase):
 
         data = result["data"]
         self.assertEqual(data.serial, test_serial)
+
+    def test_serialless_route_to_placeholder(self):
+        from stickercode.views import LabelViews
+
+        # If the blank_label view is requested, always return
+        # placeholder file
+        request = testing.DummyRequest()
+        inst = LabelViews(request)
+        result = inst.blank_label()
+        
+        self.assertEqual(result.content_length, 32743)
 
     def test_view_unknown_serial_returns_placeholder(self):
         from stickercode.views import LabelViews
@@ -178,11 +187,12 @@ class FunctionalTests(unittest.TestCase):
 
     def test_get_form_view(self):
         res = self.testapp.get("/qr_label")
-        #log.info("label form res: %s", res)
         self.assertEqual(res.status_code, 200)
 
         form = res.forms["deform"]
         self.assertEqual(form["serial"].value, "")
+
+        self.assertTrue("src=\"/show_label" in res.body)
 
     def test_post_form_returns_populated_data(self):
         ft_serial = "FT7890"
@@ -192,6 +202,11 @@ class FunctionalTests(unittest.TestCase):
         form["serial"] = ft_serial
 
         submit_res = form.submit("submit")
-        #log.info("post submit: %s", submit_res)
+        new_form = submit_res.forms["deform"]
+        self.assertEqual(new_form["serial"].value, ft_serial)
+
+        # Re-submit to make sure the directory is not overwritten for
+        # coverage
+        submit_res = form.submit("submit")
         new_form = submit_res.forms["deform"]
         self.assertEqual(new_form["serial"].value, ft_serial)

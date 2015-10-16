@@ -23,6 +23,7 @@ class StickerSchema(colander.Schema):
     a deform object.
     """
     serial = colander.SchemaNode(colander.String(),
+                validator=colander.Length(3, 10),
                 description="Non empty serial")
 
 
@@ -34,6 +35,14 @@ class LabelViews(object):
     """
     def __init__(self, request):
         self.request = request
+
+    @view_config(route_name="blank_label")
+    def blank_label(self):
+        """ Match a route without the serial in matchdict, return the
+        placeholder image.
+        """
+        log.info("Return blank label")
+        return FileResponse("resources/example_qr_label.png")
 
     @view_config(route_name="show_label")
     def show_label(self):
@@ -58,8 +67,8 @@ class LabelViews(object):
         form = Form(schema, buttons=("submit",))
         local = self.empty_form()    
 
-        log.info("in form submitted %s", self.request.POST)
         if "submit" in self.request.POST:
+            log.info("in form submitted %s", self.request.POST)
             try:
                 # Deserialize into hash on validation - capture is the
                 # appstruct in deform land
