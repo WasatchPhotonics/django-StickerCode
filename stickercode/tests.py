@@ -4,8 +4,11 @@ wrapper.
 
 import os
 import sys
+import shutil
 import logging
 import unittest
+
+from slugify import slugify
 
 from pyramid import testing
 
@@ -44,10 +47,23 @@ class TestStickerGenerator(unittest.TestCase):
 
 class TestStickerCodeViews(unittest.TestCase):
     def setUp(self):
+        self.clean_test_files()
         self.config = testing.setUp()
 
     def tearDown(self):
+        # Comment out this line for easier post-test state inspections
+        #self.clean_test_files()
         testing.tearDown()
+
+    def clean_test_files(self):
+        # Remove the directory if it exists
+        test_serials = ["FT1234", "UT5555", "UT0001"]
+
+        for item in test_serials:
+            dir_out = "database/%s" % slugify(item)
+            if os.path.exists(dir_out):
+                result = shutil.rmtree(dir_out)
+                self.assertIsNone(result)
 
     def test_get_returns_empty_form(self):
         from stickercode.views import LabelViews
@@ -57,8 +73,10 @@ class TestStickerCodeViews(unittest.TestCase):
         result = inst.qr_label()
 
         data = result["data"]
-
         self.assertEqual(data.serial, "")
+
+        #links = result["links"]
+        #self.assertEqual(links.label_img, "default_image.png") 
 
     def test_post_returns_populated_data(self):
         from stickercode.views import LabelViews
@@ -84,7 +102,70 @@ class TestStickerCodeViews(unittest.TestCase):
         data = result["data"]
         self.assertEqual(data.serial, test_serial)
 
+    def test_view_unknown_serial_returns_placeholder(self):
+        from stickercode.views import LabelViews
+
+        # No serial should raise exception
+        request = testing.DummyRequest()
+        inst = LabelViews(request)
+        self.assertRaises(KeyError, inst.show_label) 
+
+        # If the specified serial is blank or not found, return the
+        # placeholder image
+        request = testing.DummyRequest()
+        request.matchdict["serial"] = ""
+        inst = LabelViews(request)
+        result = inst.show_label()
+        
+        self.assertEqual(result.content_length, 32743)
+
+    def test_view_known_generated_label(self):
+        from stickercode.views import LabelViews
+        
+        # copy a known image into the database folder, make sure the get
+        # sizes match
+
+        test_serial = slugify("UT5555")
+        dir_out = "database/%s/" % test_serial
        
+        os.makedirs(dir_out)
+        
+        source_file = "resources/known_example.png"
+        dest_file = "%s/label.png" % dir_out
+
+        shutil.copy(source_file, dest_file) 
+        self.assertTrue(os.path.exists(dest_file))
+        
+        request = testing.DummyRequest()
+        request.matchdict["serial"] = test_serial
+        inst = LabelViews(request)
+        result = inst.show_label()
+        
+        self.assertEqual(result.content_length, 39610)
+        
+    def test_post_generates_label_in_database(self):
+        from stickercode.views import LabelViews
+    
+        # POST to create a qr file, verify it exists on the disk
+        test_serial = "UT0001" 
+        new_dict = {"submit":"True", "serial":test_serial} 
+        request = testing.DummyRequest(new_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+
+        slug_serial = slugify(test_serial)
+        dest_file = "database/%s/label.png" % slug_serial
+        self.assertTrue(os.path.exists(dest_file))
+        self.assertEqual(os.path.getsize(dest_file), 15079)
+
+        # verify the view returns it
+        request = testing.DummyRequest()
+        request.matchdict["serial"] = test_serial
+        inst = LabelViews(request)
+        result = inst.show_label()
+        self.assertEqual(result.content_length, 15079)
+        
+ 
 class FunctionalTests(unittest.TestCase):
     def setUp(self):
         from stickercode import main
