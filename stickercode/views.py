@@ -24,7 +24,7 @@ class StickerSchema(colander.Schema):
     """
     serial = colander.SchemaNode(colander.String(),
                 validator=colander.Length(3, 10),
-                description="Non empty serial")
+                description="Maximum 10 character serial")
 
 
 class StickerForm(object):
