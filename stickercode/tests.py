@@ -14,7 +14,7 @@ from pyramid import testing
 
 from webtest import TestApp, Upload
 
-from stickercode.coverage_utils import touch_erase
+from stickercode.coverage_utils import touch_erase, size_within_range
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -31,8 +31,7 @@ class TestStickerGenerator(unittest.TestCase):
         touch_erase(filename)
 
         lbl = QL700Label()
-        actual_size = os.path.getsize(filename)
-        self.assertEqual(actual_size, 16098)
+        self.assertTrue(size_within_range(filename, 16098))
 
     def test_length_within_range(self):
         from stickercode.stickergenerator import QL700Label
@@ -164,8 +163,7 @@ class TestStickerCodeViews(unittest.TestCase):
 
         slug_serial = slugify(test_serial)
         dest_file = "database/%s/label.png" % slug_serial
-        self.assertTrue(os.path.exists(dest_file))
-        self.assertEqual(os.path.getsize(dest_file), 15337)
+        self.assertTrue(size_within_range(dest_file, 15337))
 
         # verify the view returns it
         request = testing.DummyRequest()
