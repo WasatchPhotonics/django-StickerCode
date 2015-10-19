@@ -15,7 +15,7 @@ def touch_erase(filename):
 
     return os.path.exists(filename)
 
-def size_within_range(filename, expected_size, ok_range=50):
+def file_range(filename, expected_size, ok_range=50):
     """ Files are slightly different sizes on travis build then on local
     machine. For tests that include building an image using Pillow. I'm
     guessing this is due to slightly different pillow versions. This
@@ -29,6 +29,11 @@ def size_within_range(filename, expected_size, ok_range=50):
 
     actual_size = os.path.getsize(filename)
 
+    return size_range(actual_size, expected_size, ok_range)
+
+def size_range(actual_size, expected_size, ok_range=50):
+    """ Simple comparison of two size ranges.
+    """
     min_size = expected_size - ok_range
     max_size = expected_size + ok_range
 
@@ -39,3 +44,5 @@ def size_within_range(filename, expected_size, ok_range=50):
         return False
 
     return True
+
+    

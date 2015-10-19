@@ -14,7 +14,8 @@ from pyramid import testing
 
 from webtest import TestApp, Upload
 
-from stickercode.coverage_utils import touch_erase, size_within_range
+from stickercode.coverage_utils import touch_erase
+from stickercode.coverage_utils import size_range, file_range
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -24,6 +25,22 @@ frmt = logging.Formatter("%(name)s - %(levelname)s %(message)s")
 strm.setFormatter(frmt)
 log.addHandler(strm)
 
+class TestCoverageUtils(unittest.TestCase):
+        
+    def test_file_does_not_exist(self):
+        filename = "known_unknown_file"
+        self.assertFalse(file_range(filename, 10000))
+
+    def test_file_sizes_out_of_range(self):
+        filename = "resources/example_qr_label.png"
+        # Too small with default range 50
+        self.assertFalse(file_range(filename, 30000))
+        # Too big
+        self.assertFalse(file_range(filename, 33000))
+    
+        
+        
+
 class TestStickerGenerator(unittest.TestCase):
     def test_all_options_unrequired(self):
         from stickercode.stickergenerator import QL700Label
@@ -31,7 +48,7 @@ class TestStickerGenerator(unittest.TestCase):
         touch_erase(filename)
 
         lbl = QL700Label()
-        self.assertTrue(size_within_range(filename, 16098))
+        self.assertTrue(file_range(filename, 16098))
 
     def test_length_within_range(self):
         from stickercode.stickergenerator import QL700Label
@@ -149,7 +166,7 @@ class TestStickerCodeViews(unittest.TestCase):
         inst = LabelViews(request)
         result = inst.show_label()
         
-        self.assertEqual(result.content_length, 39610)
+        self.assertTrue(size_range(result.content_length, 39610))
         
     def test_post_generates_label_in_database(self):
         from stickercode.views import LabelViews
@@ -163,14 +180,14 @@ class TestStickerCodeViews(unittest.TestCase):
 
         slug_serial = slugify(test_serial)
         dest_file = "database/%s/label.png" % slug_serial
-        self.assertTrue(size_within_range(dest_file, 15337))
+        self.assertTrue(file_range(dest_file, 15337))
 
         # verify the view returns it
         request = testing.DummyRequest()
         request.matchdict["serial"] = test_serial
         inst = LabelViews(request)
         result = inst.show_label()
-        self.assertEqual(result.content_length, 15337)
+        self.assertTrue(size_range(result.content_length, 15337))
         
  
 class FunctionalTests(unittest.TestCase):
