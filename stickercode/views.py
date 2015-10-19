@@ -57,7 +57,7 @@ class LabelViews(object):
 
         return FileResponse(filename)
 
-    @view_config(route_name="qr_label", renderer="templates/home.pt")
+    @view_config(route_name="qr_label", renderer="templates/qr_form.pt")
     def qr_label(self):
         """ Process form parameters, create a qr code or return an empty
         form.
