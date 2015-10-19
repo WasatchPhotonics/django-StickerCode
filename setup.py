@@ -24,6 +24,8 @@ requires = [
     "PyQRNative",
     "pillow",
     "deform",
+    "nose",
+    "coverage",
     ]
 
 setup(name="stickercode",
