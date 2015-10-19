@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)http://deform2demo.repoze.org/fielddefaults/ -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="${request.locale_name}">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>
-            Deform 2 Demo Site
-        </title>
+        <title>Sticker Code web application</title>
 
         <link rel="stylesheet" href="${request.static_url('stickercode:static/pygments.css')}" type="text/css">
         <link rel="stylesheet" href="${request.static_url('stickercode:static/form.css')}" type="text/css">
@@ -34,13 +33,30 @@
         <script type="text/javascript" src="${request.static_url('stickercode:static/jquery.maskedinput-1.3.1.min.js')}"></script>
         
 
+        <link rel="apple-touch-icon" sizes="57x57" href="/static/images/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="/static/images/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/static/images/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="/static/images/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="/static/images/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="/static/images/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="/static/images/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="/static/images/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/static/images/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/static/images/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+        <link rel="manifest" href="/static/images/manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/static/images/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
     </head>
 
     <body id="public">
 
     <div class="navbar navbar-default" role="navigation">
         <div class="container">
-            <a class="navbar-brand" href="http://deform2demo.repoze.org/"><span class="glyphicon glyphicon-info-sign"></span> Deform 2 Demo</a>
+            <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-info-sign"></span>QR Sticker Web Application</a>
         </div>
     </div>
 
@@ -50,268 +66,7 @@
             <div class="col-3 col-lg-3 col-sm-3">
                 <div class="list-group">
                     <a href="http://deform2demo.repoze.org/ajaxform/" class="list-group-item">
-                        AJAX form submission (inline success)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/ajaxform_redirect/" class="list-group-item">
-                        AJAX form submission (redirect on success)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/autocomplete_input/" class="list-group-item">
-                        Autocomplete Input Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/autocomplete_remote_input/" class="list-group-item">
-                        Autocomplete Input Widget (with Remote Data Source)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkboxchoice/" class="list-group-item">
-                        Checkbox Choice Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkboxchoice_inline/" class="list-group-item">
-                        Checkbox Choice Widget (inline)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkboxchoice_readonly/" class="list-group-item">
-                        Checkbox Choice Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkboxchoice2/" class="list-group-item">
-                        Checkbox Choice Widget (with required field)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkbox/" class="list-group-item">
-                        Checkbox Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkbox_readonly/" class="list-group-item">
-                        Checkbox Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkbox_with_label/" class="list-group-item">
-                        Checkbox Widget (with Label)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkedinput/" class="list-group-item">
-                        Checked Input Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkedinput_readonly/" class="list-group-item">
-                        Checked Input Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkedinput_withmask/" class="list-group-item">
-                        Checked Input Widget (with Input Mask)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkedpassword/" class="list-group-item">
-                        Checked Password Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/checkedpassword_readonly/" class="list-group-item">
-                        Checked Password Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/custom_classes_on_outermost_html_element/" class="list-group-item">
-                        Custom classes on outermost html element of Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/dateinput/" class="list-group-item">
-                        Date Input Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/dateparts/" class="list-group-item">
-                        Date Parts Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/dateparts_readonly/" class="list-group-item">
-                        Date Parts Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/datetimeinput/" class="list-group-item">
-                        DateTime Input Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/datetimeinput_readonly/" class="list-group-item">
-                        DateTime Input Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/deferred_schema_bindings/" class="list-group-item">
-                        Deferred Schema Bindings
-                    </a>
-                    <a href="http://deform2demo.repoze.org/readonly_value_nonvalidation/" class="list-group-item">
-                        Dont Validate Readonly Fields
-                    </a>
-                    <a href="http://deform2demo.repoze.org/edit/" class="list-group-item">
-                        Edit Form
-                    </a>
-                    <a href="/Deform 2 Demo Site.html" class="list-group-item active">
-                        Field Defaults
-                    </a>
-                    <a href="http://deform2demo.repoze.org/file/" class="list-group-item">
-                        File Upload Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/file_readonly/" class="list-group-item">
-                        File Upload Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/hidden_field/" class="list-group-item">
-                        Hidden Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/hiddenmissing/" class="list-group-item">
-                        Hidden Widget (missing, representing an Integer)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/interfield/" class="list-group-item">
-                        Inter-Field Validation
-                    </a>
-                    <a href="http://deform2demo.repoze.org/i18n/" class="list-group-item">
-                        Internationalization
-                    </a>
-                    <a href="http://deform2demo.repoze.org/mapping/" class="list-group-item">
-                        Mapping Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/money_input/" class="list-group-item">
-                        Money Input
-                    </a>
-                    <a href="http://deform2demo.repoze.org/multiple_error_messages_mapping/" class="list-group-item">
-                        Multiple Error Messages For a Single Widget (Mapping)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/multiple_error_messages_seq/" class="list-group-item">
-                        Multiple Error Messages For a Single Widget (Sequence)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/multiple_forms/" class="list-group-item">
-                        Multiple Forms on the Same Page
-                    </a>
-                    <a href="http://deform2demo.repoze.org/nonrequiredfields/" class="list-group-item">
-                        Non-Required Fields
-                    </a>
-                    <a href="http://deform2demo.repoze.org/nonrequired_number_fields/" class="list-group-item">
-                        Non-Required Number Fields
-                    </a>
-                    <a href="http://deform2demo.repoze.org/password/" class="list-group-item">
-                        Password Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/pyramid_csrf_demo/" class="list-group-item">
-                        Pyramid CSRF Demo (using schema binding)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/radiochoice/" class="list-group-item">
-                        Radio Choice Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/radiochoice_inline/" class="list-group-item">
-                        Radio Choice Widget (inline)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/radiochoice_readonly/" class="list-group-item">
-                        Radio Choice Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/radiochoice_int/" class="list-group-item">
-                        Radio Choice Widget (with int values)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/readonly_fields/" class="list-group-item">
-                        Read-Only Fields
-                    </a>
-                    <a href="http://deform2demo.repoze.org/require_one_or_another/" class="list-group-item">
-                        Require One Field or Another
-                    </a>
-                    <a href="http://deform2demo.repoze.org/richtext/" class="list-group-item">
-                        Rich Text Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/delayed_richtext/" class="list-group-item">
-                        Rich Text Widget (delayed)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/richtext_i18n/" class="list-group-item">
-                        Rich Text Widget (internationalized)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/richtext_readonly/" class="list-group-item">
-                        Rich Text Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select/" class="list-group-item">
-                        Select Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_readonly/" class="list-group-item">
-                        Select Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_integer/" class="list-group-item">
-                        Select Widget (with Integer values)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_default/" class="list-group-item">
-                        Select Widget (with default)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_deferred/" class="list-group-item">
-                        Select Widget (with deferred choices and default)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_multiple/" class="list-group-item">
-                        Select Widget (with mulitple)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_optgroup_and_label_attributes/" class="list-group-item">
-                        Select Widget (with optgroup and label attributes)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_optgroup/" class="list-group-item">
-                        Select Widget (with optgroup)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_size/" class="list-group-item">
-                        Select Widget (with size)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select_with_unicode/" class="list-group-item">
-                        Select Widget (with unicode)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select2/" class="list-group-item">
-                        Select2 Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select2_with_multiple/" class="list-group-item">
-                        Select2 Widget (with mulitple)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/select2_with_optgroup/" class="list-group-item">
-                        Select2 Widget (with optgroup)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_orderable/" class="list-group-item">
-                        Sequence (of Mappings) with Ordering Enabled
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_with_prototype_that_has_no_name/" class="list-group-item">
-                        Sequence With Prototype that Has No Name
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_autocompletes/" class="list-group-item">
-                        Sequence of Autocomplete Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_constrained_len/" class="list-group-item">
-                        Sequence of Constrained Min and Max Lengths
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_dateinputs/" class="list-group-item">
-                        Sequence of Date Inputs
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_defaulted_selects/" class="list-group-item">
-                        Sequence of Defaulted Selects
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_defaulted_selects_with_initial_item/" class="list-group-item">
-                        Sequence of Defaulted Selects (with Initial Item)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_fileuploads/" class="list-group-item">
-                        Sequence of File Upload Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_fileuploads_with_initial_item/" class="list-group-item">
-                        Sequence of File Upload Widgets (with Initial Item)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_i18n/" class="list-group-item">
-                        Sequence of I18N
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_mappings/" class="list-group-item">
-                        Sequence of Mapping Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_mappings_with_initial_item/" class="list-group-item">
-                        Sequence of Mapping Widgets (with Initial Item)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/readonly_sequence_of_mappings/" class="list-group-item">
-                        Sequence of Mappings (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_masked_textinputs/" class="list-group-item">
-                        Sequence of Masked Text Inputs
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_radiochoices/" class="list-group-item">
-                        Sequence of Radio Choice Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_richtext/" class="list-group-item">
-                        Sequence of Rich Text Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/sequence_of_sequences/" class="list-group-item">
-                        Sequence of Sequence Widgets
-                    </a>
-                    <a href="http://deform2demo.repoze.org/textareacsv/" class="list-group-item">
-                        Text Area CSV Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/textarea/" class="list-group-item">
-                        Text Area Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/textarea_readonly/" class="list-group-item">
-                        Text Area Widget (read-only)
-                    </a>
-                    <a href="http://deform2demo.repoze.org/textinputcsv/" class="list-group-item">
-                        Text Input CSV Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/text_input_masks/" class="list-group-item">
-                        Text Input Masks
-                    </a>
-                    <a href="http://deform2demo.repoze.org/textinput/" class="list-group-item">
-                        Text Input Widget
-                    </a>
-                    <a href="http://deform2demo.repoze.org/textinput_readonly/" class="list-group-item">
-                        Text Input Widget (read-only)
+                        Default QR Form creation
                     </a>
                     <a href="http://deform2demo.repoze.org/textinput_with_css_class/" class="list-group-item">
                         Text Input Widget (with CSS class)
@@ -329,144 +84,71 @@
             </div>
             <div class="col-9 col-lg-9 col-sm-9">
                 <div>
-    
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Demo: Field Defaults</h3>
+                        </div>
+                <div class="panel-body">
+                    <div id="form"><form id="deform" method="POST" enctype="multipart/form-data" accept-charset="utf-8" class="deform">
+                        <fieldset class="deformFormFieldset">
+                            <input type="hidden" name="_charset_">
+                            <input type="hidden" name="__formid__" value="deform">
+                            <div class="form-group  " title="Song name" id="item-deformField1">
+                                <label for="deformField1" class="control-label required" id="req-deformField1">
+                                    Artist
+                                </label>
+                                <input type="text" name="artist" value="Grandaddy" id="deformField1" class=" form-control ">
+                                <p class="help-block">
+                                    Song name
+                                </p>
+                            </div>
+                            <div class="form-group  " title="" id="item-deformField2">
+                                <label for="deformField2" class="control-label required" id="req-deformField2">
+                                    Album
+                                </label>
+                                <input type="text" name="album" value="Just Like the Fambly Cat" id="deformField2" class=" form-control ">
+                            </div>
+                            <div class="form-group  " title="Song name" id="item-deformField3">
+                                <label for="deformField3" class="control-label required" id="req-deformField3">
+                                    Song
+                                </label>
+                                <input type="text" name="song" value="" id="deformField3" class=" form-control ">
+                                <p class="help-block">
+                                    Song name
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <button id="deformsubmit" name="submit" type="submit" class="btn btn-primary " value="submit">
+                                    Submit
+                                </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                    </div>
+                </div>
+            </div>
 
+            <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Captured submission</h3>
+                    </div>
+                    <div class="panel-body">
+                        <pre style="border: none; background-color: #FFF" class="highlight" id="captured"><span class="bp">None</span>
+                        </pre>
+                    </div>
+            </div>
 
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Demo: Field Defaults</h3>
-      </div>
-      <div class="panel-body">
-        <div id="form"><form id="deform" method="POST" enctype="multipart/form-data" accept-charset="utf-8" class="deform">
-
-  <fieldset class="deformFormFieldset">
-
-    
-
-    <input type="hidden" name="_charset_">
-    <input type="hidden" name="__formid__" value="deform">
-
-    
-
-    
-
-    <div class="form-group  " title="Song name" id="item-deformField1">
-
-  <label for="deformField1" class="control-label required" id="req-deformField1">
-    Artist
-  </label>
-
-  
-    <input type="text" name="artist" value="Grandaddy" id="deformField1" class=" form-control ">
-  
-
-  
-
-  <p class="help-block">
-    Song name
-  </p>
-</div>
-
-    <div class="form-group  " title="" id="item-deformField2">
-
-  <label for="deformField2" class="control-label required" id="req-deformField2">
-    Album
-  </label>
-
-  
-    <input type="text" name="album" value="Just Like the Fambly Cat" id="deformField2" class=" form-control ">
-  
-
-  
-
-  
-</div>
-
-    <div class="form-group  " title="Song name" id="item-deformField3">
-
-  <label for="deformField3" class="control-label required" id="req-deformField3">
-    Song
-  </label>
-
-  
-    <input type="text" name="song" value="" id="deformField3" class=" form-control ">
-  
-
-  
-
-  <p class="help-block">
-    Song name
-  </p>
-</div>
-
-
-    <div class="form-group">
-      
-        <button id="deformsubmit" name="submit" type="submit" class="btn btn-primary " value="submit">
-          
-          Submit
-        </button>
-      
-    </div>
-
-  </fieldset>
-
-  
-
-</form>
-</div>
-      </div>
-    </div>
-
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title">Captured submission</h3>
-      </div>
-      <div class="panel-body">
-        <pre style="border: none; background-color: #FFF" class="highlight" id="captured"><span class="bp">None</span>
-</pre>
-      </div>
-    </div>
-
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Code <a href="http://deform2demo.repoze.org/allcode?start=1339&end=1359#line-1339"><small>
-        (click to show in context)</small></a>
-        </h3>
-      </div>
-      <div class="panel-body highlight">
-        <pre style="border: none; background-color: #FFF">    <span class="nd">@view_config</span><span class="p">(</span><span class="n">renderer</span><span class="o">=</span><span class="s">'templates/form.pt'</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'fielddefaults'</span><span class="p">)</span>
-    <span class="nd">@demonstrate</span><span class="p">(</span><span class="s">'Field Defaults'</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">fielddefaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">colander</span><span class="o">.</span><span class="n">Schema</span><span class="p">):</span>
-            <span class="n">artist</span> <span class="o">=</span> <span class="n">colander</span><span class="o">.</span><span class="n">SchemaNode</span><span class="p">(</span>
-                <span class="n">colander</span><span class="o">.</span><span class="n">String</span><span class="p">(),</span>
-                <span class="n">default</span><span class="o">=</span><span class="s">'Grandaddy'</span><span class="p">,</span>
-                <span class="n">description</span><span class="o">=</span><span class="s">'Song name'</span><span class="p">)</span>
-            <span class="n">album</span> <span class="o">=</span> <span class="n">colander</span><span class="o">.</span><span class="n">SchemaNode</span><span class="p">(</span>
-                <span class="n">colander</span><span class="o">.</span><span class="n">String</span><span class="p">(),</span>
-                <span class="n">default</span><span class="o">=</span><span class="s">'Just Like the Fambly Cat'</span><span class="p">)</span>
-            <span class="n">song</span> <span class="o">=</span> <span class="n">colander</span><span class="o">.</span><span class="n">SchemaNode</span><span class="p">(</span>
-                <span class="n">colander</span><span class="o">.</span><span class="n">String</span><span class="p">(),</span>
-                <span class="n">description</span><span class="o">=</span><span class="s">'Song name'</span><span class="p">)</span>
-
-        <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">()</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">deform</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">buttons</span><span class="o">=</span><span class="p">(</span><span class="s">'submit'</span><span class="p">,))</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_form</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</pre>
-      </div>
-    </div>
-  </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Code <a href="http://deform2demo.repoze.org/allcode?start=1339&end=1359#line-1339"><small>
+                        (click to show in context)</small></a>
+                    </h3>
+                </div>
+            <div class="panel-body highlight">
             </div>
         </div>
-
     </div>
+</div>
 
-    
-
-    
-
-
-</body></html>
+</body>
+</html>
