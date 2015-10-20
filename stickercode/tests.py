@@ -296,7 +296,7 @@ class TestStickerCodeViews(unittest.TestCase):
 
         slug_serial = slugify(test_serial)
         dest_file = "label_files/%s/label.png" % slug_serial
-        self.assertTrue(file_range(dest_file, 62250))
+        self.assertTrue(file_range(dest_file, 62250, ok_range=1000))
 
     def test_post_with_invalid_image_size_uses_default(self):
         from stickercode.views import LabelViews
