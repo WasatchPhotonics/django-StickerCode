@@ -32,6 +32,8 @@ class MemoryTmpStore(dict):
     the missing implementation of preview_url.
     """
     def preview_url(self, uid):
+        """ provide interface for schemanode
+        """
         return None
 
 
@@ -54,9 +56,9 @@ class StickerSchema(colander.Schema):
     tmpstore = MemoryTmpStore()
     fuw = widget.FileUploadWidget(tmpstore)
     upload = colander.SchemaNode(FileData(), 
-                                missing=colander.null,
-                                widget=fuw,
-                                description="Background Image")
+                                 missing=colander.null,
+                                 widget=fuw,
+                                 description="Background Image")
 
 
 class StickerForm(object):
@@ -66,6 +68,7 @@ class StickerForm(object):
     domain = "https://waspho.com"
     slugged = ""
     filename = ""
+    upload = ""
 
 class LabelViews(object):
     """ Return forms and png objects for post generated content.
