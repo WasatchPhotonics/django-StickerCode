@@ -73,7 +73,7 @@ class TestStickerCodeViews(unittest.TestCase):
         test_serials = ["FT1234", "UT5555", "UT0001"]
 
         for item in test_serials:
-            dir_out = "database/%s" % slugify(item)
+            dir_out = "label_files/%s" % slugify(item)
             if os.path.exists(dir_out):
                 result = shutil.rmtree(dir_out)
                 self.assertIsNone(result)
@@ -173,11 +173,11 @@ class TestStickerCodeViews(unittest.TestCase):
     def test_view_known_generated_label(self):
         from stickercode.views import LabelViews
         
-        # copy a known image into the database folder, make sure the get
+        # copy a known image into the label_file folder, make sure the get
         # sizes match
 
         test_serial = slugify("UT5555")
-        dir_out = "database/%s/" % test_serial
+        dir_out = "label_files/%s/" % test_serial
        
         os.makedirs(dir_out)
         
@@ -194,7 +194,7 @@ class TestStickerCodeViews(unittest.TestCase):
         
         self.assertTrue(size_range(result.content_length, 39610))
         
-    def test_post_generates_label_in_database(self):
+    def test_post_generates_label_on_disk(self):
         from stickercode.views import LabelViews
     
         # POST to create a qr file, verify it exists on the disk
@@ -207,7 +207,7 @@ class TestStickerCodeViews(unittest.TestCase):
 
         # Verify the file exists on disk
         slug_serial = slugify(test_serial)
-        dest_file = "database/%s/label.png" % slug_serial
+        dest_file = "label_files/%s/label.png" % slug_serial
         self.assertTrue(file_range(dest_file, 15337))
 
         # verify the view returns it
@@ -229,7 +229,7 @@ class FunctionalTests(unittest.TestCase):
         del self.testapp
 
     def test_get_form_view(self):
-        res = self.testapp.get("/qr_label")
+        res = self.testapp.get("/")
         self.assertEqual(res.status_code, 200)
 
         form = res.forms["deform"]
@@ -242,7 +242,7 @@ class FunctionalTests(unittest.TestCase):
         ft_serial = "FT7890"
         ft_domain = "https://waspho.com"
 
-        res = self.testapp.get("/qr_label")
+        res = self.testapp.get("/")
         form = res.forms["deform"]
         form["serial"] = ft_serial
         form["domain"] = ft_domain

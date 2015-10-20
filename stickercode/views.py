@@ -54,7 +54,7 @@ class LabelViews(object):
         parameter, or the placeholder image if not found.
         """
         serial = self.request.matchdict["serial"]
-        filename = "database/%s/label.png" % slugify(serial)
+        filename = "label_files/%s/label.png" % slugify(serial)
 
         if not os.path.exists(filename):
             filename = "resources/example_qr_label.png"
@@ -98,12 +98,12 @@ class LabelViews(object):
         return dict(data=local, form=form.render())
 
     def build_qr_label(self, local):
-        """ Create the database sub directory on disk if required, then
+        """ Create the label_files sub directory on disk if required, then
         generate the qr label and save it in the directory.
         """
         serial = slugify(local.serial)
-        dir_name = "database/%s" % serial
-        filename = "database/%s/label.png" % serial
+        dir_name = "label_files/%s" % serial
+        filename = "label_files/%s/label.png" % serial
         if os.path.exists(dir_name):
             log.info("Path exists: %s", dir_name)
         else:
