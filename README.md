@@ -11,18 +11,17 @@ PyQRNative is required. Use the fork here:
 https://github.com/WasatchPhotonics/pyqrnative for a typo correction on
 linux.
 
-Full installation procedure for Fedora Core 22:
-After creating a python virtual environment
+Full installation prerequisites for Fedora Core 22:
 
-sudo dnf install freetype-devel
-sudo dnf install gcc
-sudo dnf install libjpeg-devel
-sudo dnf install zlib-devel
+    Create a python virtual environment
+    sudo dnf install freetype-devel
+    sudo dnf install gcc
+    sudo dnf install libjpeg-devel
+    sudo dnf install zlib-devel
 
-# update around instructions area for the fork of pyqrnative too
-git clone https://github.com/WasatchPhotonics/pyqrnative
-cd pyqrnative
-$VENV/bin/python setup.py install
+    git clone https://github.com/WasatchPhotonics/pyqrnative
+    cd pyqrnative
+    $VENV/bin/python setup.py install
 
 
 - cd _directory containing this file_

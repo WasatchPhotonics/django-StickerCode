@@ -25,10 +25,14 @@ class StickerSchema(colander.Schema):
     serial = colander.SchemaNode(colander.String(),
                 validator=colander.Length(3, 10),
                 description="Maximum 10 character serial")
-
+    domain = colander.SchemaNode(colander.String(),
+                validator=colander.url,
+                default="https://waspho.com",
+                description="Valid URL")
 
 class StickerForm(object):
     serial = ""
+    domain = "https://waspho.com"
 
 class LabelViews(object):
     """ Return forms and png objects for post generated content.
@@ -66,6 +70,7 @@ class LabelViews(object):
         schema = StickerSchema()
         form = Form(schema, buttons=("submit",))
         local = self.empty_form()    
+        local.slugged = slugify(local.serial)
 
         if "submit" in self.request.POST:
             log.info("in form submitted %s", self.request.POST)
@@ -77,7 +82,9 @@ class LabelViews(object):
 
                 # Populate local data structure with deserialized data
                 local.serial = captured["serial"]
-            
+                local.domain = captured["domain"]
+                local.slugged = slugify(local.serial)
+ 
                 # build the qr label
                 self.build_qr_label(local) 
                 # Re-render the form with the fields already populated 
@@ -85,7 +92,7 @@ class LabelViews(object):
                 
             except ValidationFailure as e:
                 log.exception(e)
-                log.critical("Validation failure, return empty form")
+                log.critical("Validation failure, return form")
                 return dict(data=local, form=e.render())
 
         return dict(data=local, form=form.render())
@@ -102,7 +109,8 @@ class LabelViews(object):
         else:
             os.makedirs(dir_name)
 
-        lbl = QL700Label(filename=filename, serial=local.serial)
+        lbl = QL700Label(filename=filename, serial=local.serial,
+                         domain=local.domain)
 
     def empty_form(self):
         """ Populate an empty form object, return to web app.

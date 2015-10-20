@@ -26,7 +26,6 @@ strm.setFormatter(frmt)
 log.addHandler(strm)
 
 class TestCoverageUtils(unittest.TestCase):
-        
     def test_file_does_not_exist(self):
         filename = "known_unknown_file"
         self.assertFalse(file_range(filename, 10000))
@@ -37,9 +36,6 @@ class TestCoverageUtils(unittest.TestCase):
         self.assertFalse(file_range(filename, 30000))
         # Too big
         self.assertFalse(file_range(filename, 33000))
-    
-        
-        
 
 class TestStickerGenerator(unittest.TestCase):
     def test_all_options_unrequired(self):
@@ -61,6 +57,7 @@ class TestStickerGenerator(unittest.TestCase):
         fail_serial = "aserialnumberthatiswaytoolongtotriggerfailures"
         self.assertRaises(TypeError, QL700Label, serial=fail_serial)
 
+
 class TestStickerCodeViews(unittest.TestCase):
     def setUp(self):
         self.clean_test_files()
@@ -81,7 +78,7 @@ class TestStickerCodeViews(unittest.TestCase):
                 result = shutil.rmtree(dir_out)
                 self.assertIsNone(result)
 
-    def test_get_returns_empty_form(self):
+    def test_get_returns_default_form(self):
         from stickercode.views import LabelViews
 
         request = testing.DummyRequest()
@@ -90,13 +87,14 @@ class TestStickerCodeViews(unittest.TestCase):
 
         data = result["data"]
         self.assertEqual(data.serial, "")
-
+        self.assertEqual(data.domain, "https://waspho.com")
 
     def test_post_returns_populated_data(self):
         from stickercode.views import LabelViews
   
         test_serial = "FT1234" 
-        new_dict = {"submit":"True", "serial":test_serial} 
+        new_dict = {"submit":"True", "serial":test_serial,
+                    "domain":"https://waspho.com"} 
         request = testing.DummyRequest(new_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
@@ -104,7 +102,7 @@ class TestStickerCodeViews(unittest.TestCase):
         data = result["data"]
         self.assertEqual(data.serial, test_serial)
 
-    def test_post_invalid_data(self):
+    def test_post_invalid_serial(self):
         from stickercode.views import LabelViews
 
         test_serial = ""
@@ -115,6 +113,34 @@ class TestStickerCodeViews(unittest.TestCase):
 
         data = result["data"]
         self.assertEqual(data.serial, test_serial)
+
+    def test_post_domain(self):
+        # Specify a valid serial number, make sure the url validator on
+        # the domain field is active
+        from stickercode.views import LabelViews
+        test_domain = ""
+        new_dict = {"submit":"True", "serial":"UT5555", 
+                    "domain":test_domain}
+        request = testing.DummyRequest(new_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+
+        # submitting an invalid domain gets you the default domain back
+        data = result["data"]
+        self.assertEqual(data.domain, "https://waspho.com")
+
+        test_domain = "http://example.com"
+        new_dict = {"submit":"True", "serial":"UT5555", 
+                    "domain":test_domain}
+        request = testing.DummyRequest(new_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+
+        # submitting a valid domain gets the same domain back
+        data = result["data"]
+        self.assertEqual(data.domain, test_domain)
+
+        
 
     def test_serialless_route_to_placeholder(self):
         from stickercode.views import LabelViews
@@ -173,11 +199,13 @@ class TestStickerCodeViews(unittest.TestCase):
     
         # POST to create a qr file, verify it exists on the disk
         test_serial = "UT0001" 
-        new_dict = {"submit":"True", "serial":test_serial} 
+        new_dict = {"submit":"True", "serial":test_serial,
+                    "domain":"https://waspho.com/"} 
         request = testing.DummyRequest(new_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
 
+        # Verify the file exists on disk
         slug_serial = slugify(test_serial)
         dest_file = "database/%s/label.png" % slug_serial
         self.assertTrue(file_range(dest_file, 15337))
@@ -206,22 +234,27 @@ class FunctionalTests(unittest.TestCase):
 
         form = res.forms["deform"]
         self.assertEqual(form["serial"].value, "")
+        self.assertEqual(form["domain"].value, "https://waspho.com")
 
         self.assertTrue("src=\"/show_label" in res.body)
 
     def test_post_form_returns_populated_data(self):
         ft_serial = "FT7890"
+        ft_domain = "https://waspho.com"
 
         res = self.testapp.get("/qr_label")
         form = res.forms["deform"]
         form["serial"] = ft_serial
+        form["domain"] = ft_domain
 
         submit_res = form.submit("submit")
         new_form = submit_res.forms["deform"]
         self.assertEqual(new_form["serial"].value, ft_serial)
+        self.assertEqual(new_form["domain"].value, ft_domain)
 
         # Re-submit to make sure the directory is not overwritten for
         # coverage
         submit_res = form.submit("submit")
         new_form = submit_res.forms["deform"]
         self.assertEqual(new_form["serial"].value, ft_serial)
+        self.assertEqual(new_form["domain"].value, ft_domain)

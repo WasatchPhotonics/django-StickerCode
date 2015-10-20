@@ -128,7 +128,7 @@
                         <h3 class="panel-title">Generated QR Sticker</h3>
                     </div>
                     <div class="panel-body">
-                        <a href="/show_label/${data.serial}"><img class="responsive_img" src="/show_label/${data.serial}"></a>
+                        <a href="/show_label/${data.serial}"><img class="responsive_img" src="/show_label/${data.slugged}"></a>
                     </div>
             </div>
 <!--
