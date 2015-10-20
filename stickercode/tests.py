@@ -22,7 +22,7 @@ log.setLevel(logging.INFO)
 
 # Specify stdout as the logging output stream to reduce verbosity in the
 # nosetest output. This will let you still see all of logging when
-# running with python -u -m unittest 
+# running with python -u -m unittest, yet swallow it all in nosetest.
 strm = logging.StreamHandler(sys.stdout)
 frmt = logging.Formatter("%(name)s - %(levelname)s %(message)s")
 strm.setFormatter(frmt)
@@ -61,6 +61,18 @@ class TestStickerGenerator(unittest.TestCase):
         self.assertRaises(TypeError, QL700Label, serial=fail_serial)
 
 
+class MockFieldStorage(object):
+    """ Create a storage object that references a file for use in
+    view unittests.
+    """
+    def __init__(self, source_file_name):
+        self.filename = source_file_name
+        self.file = file(self.filename)
+        # type and length are to address the requirements of the
+        # deform/colander validations
+        self.type = "file"
+        self.length = os.path.getsize(self.filename)
+
 class TestStickerCodeViews(unittest.TestCase):
     def setUp(self):
         self.clean_test_files()
@@ -90,19 +102,48 @@ class TestStickerCodeViews(unittest.TestCase):
         data = result["data"]
         self.assertEqual(data.serial, "")
         self.assertEqual(data.domain, "https://waspho.com")
+        self.assertEqual(data.filename, "")
 
-    def test_post_returns_populated_data(self):
+    def test_post_no_image_returns_populated(self):
         from stickercode.views import LabelViews
-  
+
+        # Submitting with no upload field is valid - view will use the
+        # default background image
         test_serial = "FT1234" 
         new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com"} 
+                    "domain":"https://waspho.com",}
+
         request = testing.DummyRequest(new_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
 
         data = result["data"]
         self.assertEqual(data.serial, test_serial)
+        self.assertEqual(data.domain, "https://waspho.com")
+        self.assertEqual(data.filename, "using default")
+
+    def test_post_with_image_returns_populated_data(self):
+        from stickercode.views import LabelViews
+
+        # deform/colander requires a dictionary to address the multiple
+        # upload fields. This is not required for 'plain' html file
+        # uploads
+        fname = "resources/known_example.png"
+        img_back = MockFieldStorage(fname)
+        upload_dict = {"upload":img_back}
+ 
+        test_serial = "FT1234" 
+        new_dict = {"submit":"True", "serial":test_serial,
+                    "domain":"https://waspho.com",
+                    "upload":upload_dict} 
+        request = testing.DummyRequest(new_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+
+        data = result["data"]
+        self.assertEqual(data.serial, test_serial)
+        self.assertEqual(data.domain, "https://waspho.com")
+        self.assertEqual(data.filename, fname)
 
     def test_post_invalid_serial(self):
         from stickercode.views import LabelViews
@@ -237,6 +278,7 @@ class FunctionalTests(unittest.TestCase):
         form = res.forms["deform"]
         self.assertEqual(form["serial"].value, "")
         self.assertEqual(form["domain"].value, "https://waspho.com")
+        self.assertEqual(form["upload"].value, "")
 
         self.assertTrue("src=\"/show_label" in res.body)
 
