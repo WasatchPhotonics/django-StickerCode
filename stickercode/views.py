@@ -23,16 +23,19 @@ class StickerSchema(colander.Schema):
     a deform object.
     """
     serial = colander.SchemaNode(colander.String(),
-                validator=colander.Length(3, 10),
-                description="Maximum 10 character serial")
+                                 validator=colander.Length(3, 10),
+                                 description="Max 10 character serial")
     domain = colander.SchemaNode(colander.String(),
-                validator=colander.url,
-                default="https://waspho.com",
-                description="Valid URL")
+                                 validator=colander.url,
+                                 default="https://waspho.com",
+                                 description="Valid URL")
 
 class StickerForm(object):
+    """ placeholder class for generating empty sticker form data.
+    """
     serial = ""
     domain = "https://waspho.com"
+    slugged = ""
 
 class LabelViews(object):
     """ Return forms and png objects for post generated content.
@@ -70,7 +73,6 @@ class LabelViews(object):
         schema = StickerSchema()
         form = Form(schema, buttons=("submit",))
         local = self.empty_form()    
-        local.slugged = slugify(local.serial)
 
         if "submit" in self.request.POST:
             log.info("in form submitted %s", self.request.POST)
@@ -90,10 +92,10 @@ class LabelViews(object):
                 # Re-render the form with the fields already populated 
                 return dict(data=local, form=form.render(captured))
                 
-            except ValidationFailure as e:
-                log.exception(e)
+            except ValidationFailure as exc:
+                log.exception(exc)
                 log.critical("Validation failure, return form")
-                return dict(data=local, form=e.render())
+                return dict(data=local, form=exc.render())
 
         return dict(data=local, form=form.render())
 
@@ -111,6 +113,7 @@ class LabelViews(object):
 
         lbl = QL700Label(filename=filename, serial=local.serial,
                          domain=local.domain)
+        log.info("Label generated [%s]", lbl)
 
     def empty_form(self):
         """ Populate an empty form object, return to web app.

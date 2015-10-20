@@ -12,7 +12,7 @@ from slugify import slugify
 
 from pyramid import testing
 
-from webtest import TestApp, Upload
+from webtest import TestApp
 
 from stickercode.coverage_utils import touch_erase
 from stickercode.coverage_utils import size_range, file_range
@@ -75,7 +75,7 @@ class TestStickerCodeViews(unittest.TestCase):
         for item in test_serials:
             dir_out = "label_files/%s" % slugify(item)
             if os.path.exists(dir_out):
-                result = shutil.rmtree(dir_out)
+                shutil.rmtree(dir_out)
                 self.assertIsNone(result)
 
     def test_get_returns_default_form(self):

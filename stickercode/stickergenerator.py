@@ -65,7 +65,7 @@ class QL700Label(object):
         font = ImageFont.truetype(self.font_sans, 30)
 
         dtxt = "%s/" % self.domain
-        txt_draw.text((145, 205), dtxt, font = font)
+        txt_draw.text((145, 205), dtxt, font=font)
 
         bold_font = ImageFont.truetype(self.font_bold, 40)
         txt_draw.text((410, 198), self.serial, font=bold_font)
