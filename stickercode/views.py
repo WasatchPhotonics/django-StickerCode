@@ -2,9 +2,12 @@
 """
 
 import os
+import shutil
 import logging
 
 import colander
+
+from PIL import Image
 
 from slugify import slugify
  
@@ -119,9 +122,13 @@ class LabelViews(object):
                     local.filename = "using default"
                 else:
                     local.filename = captured["upload"]["filename"]
+                    local.upload = captured["upload"]
+                    self.write_file(local)
+                    self.check_file_size(local)
 
                 # build the qr label
                 self.build_qr_label(local) 
+
                 # Re-render the form with the fields already populated 
                 return dict(data=local, form=form.render(captured))
                 
@@ -144,9 +151,51 @@ class LabelViews(object):
         else:
             os.makedirs(dir_name)
 
-        lbl = QL700Label(filename=filename, serial=local.serial,
-                         domain=local.domain)
+        # Render with the custom uploaded background if it exists
+        back_name = "%s/custom_background.png" % dir_name
+        if os.path.exists(back_name):
+            lbl = QL700Label(filename=filename, serial=local.serial,
+                             domain=local.domain, base_img=back_name)
+        else:
+            lbl = QL700Label(filename=filename, serial=local.serial,
+                             domain=local.domain)
         log.info("Label generated [%s]", lbl)
+
+    def check_file_size(self, upload_obj):
+        """ If a custom_background image for that serial number exists
+        on disk, delete it if it is the wrong size.
+        """
+        final_dir = "label_files/%s" % slugify(upload_obj.serial)
+        img_file = "%s/custom_background.png" % final_dir
+        if os.path.exists(img_file): 
+            img = Image.open(img_file)
+            (width, height) = img.size
+            if width != 1050 or height != 329:
+                log.critical("Wrong file size: %s, %s", width, height)
+                os.remove(img_file)
+
+
+    def write_file(self, upload_obj):
+        """ With file from the post request, write to a temporary file,
+        then ultimately to the destination specified.
+        """
+        temp_file = "label_files/temp_file"
+
+        upload_file = upload_obj.upload["fp"]
+        upload_file.seek(0)
+        with open(temp_file, "wb") as output_file:
+            shutil.copyfileobj(upload_file, output_file)
+
+        # Create the directory if it does not exist
+        final_dir = "label_files/%s" % slugify(upload_obj.serial)
+        if not os.path.exists(final_dir):
+            log.info("Make directory: %s", final_dir)
+            os.makedirs(final_dir)
+
+        final_file = "%s/custom_background.png" % final_dir
+
+        os.rename(temp_file, final_file)
+        log.info("Saved file: %s", final_file)
 
     def empty_form(self):
         """ Populate an empty form object, return to web app.
