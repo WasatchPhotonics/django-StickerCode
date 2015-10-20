@@ -76,7 +76,6 @@ class TestStickerCodeViews(unittest.TestCase):
             dir_out = "label_files/%s" % slugify(item)
             if os.path.exists(dir_out):
                 shutil.rmtree(dir_out)
-                self.assertIsNone(result)
 
     def test_get_returns_default_form(self):
         from stickercode.views import LabelViews
