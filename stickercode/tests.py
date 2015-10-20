@@ -20,7 +20,10 @@ from stickercode.coverage_utils import size_range, file_range
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-strm = logging.StreamHandler(sys.stderr)
+# Specify stdout as the logging output stream to reduce verbosity in the
+# nosetest output. This will let you still see all of logging when
+# running with python -u -m unittest 
+strm = logging.StreamHandler(sys.stdout)
 frmt = logging.Formatter("%(name)s - %(levelname)s %(message)s")
 strm.setFormatter(frmt)
 log.addHandler(strm)

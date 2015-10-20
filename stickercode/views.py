@@ -93,8 +93,8 @@ class LabelViews(object):
                 return dict(data=local, form=form.render(captured))
                 
             except ValidationFailure as exc:
-                log.exception(exc)
-                log.critical("Validation failure, return form")
+                #log.exception(exc)
+                log.critical("Validation failure, return default form")
                 return dict(data=local, form=exc.render())
 
         return dict(data=local, form=form.render())
