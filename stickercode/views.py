@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 class MemoryTmpStore(dict):
     """ Instances of this class implement the
     :class:`deform.interfaces.FileUploadTempStore` interface
-    This is ripped from the deform2demo code: 
+    This is from the deform2demo code: 
     https://github.com/Pylons/deformdemo/blob/master/deformdemo/\
         __init__.py
     If you attempt to make tmpstore a class of FileUploadTempStore as
@@ -108,7 +108,6 @@ class LabelViews(object):
         local = self.empty_form()    
 
         if "submit" in self.request.POST:
-            log.info("in form submitted %s", self.request.POST)
             try:
                 # Deserialize into hash on validation - capture is the
                 # appstruct in deform land
