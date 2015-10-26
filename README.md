@@ -5,7 +5,7 @@ Web service to create qr codes, short links and QL-700 shaped stickers
 for device serialization.
 
 
-![StickerCode screenshot](/resources/application_screenshot.png "StickCode screenshot")
+![StickerCode screenshot](/resources/demo.gif "StickerCode screenshot")
 
 Getting Started
 ---------------
