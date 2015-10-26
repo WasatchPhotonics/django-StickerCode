@@ -261,12 +261,6 @@ class FunctionalTests(unittest.TestCase):
         match_example = "assets/img/example_qr_label.png"
         self.assertTrue(match_example in res.body)
 
-    def test_hello_json(self):
-        res = self.testapp.get('/howdy.json', status=200)
-        self.assertEqual(res.content_type, 'application/json')
-        print "res: %s", res
-        #self.assertIn(b'{"name": "Hello View"}', res.body)
-
     def test_imagery_placeholder_is_accessible(self):
         res = self.testapp.get("/assets/img/example_qr_label.png")
         self.assertEqual(res.status_code, 200)
