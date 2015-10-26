@@ -76,25 +76,13 @@ class LabelViews(object):
     def __init__(self, request):
         self.request = request
 
-    @view_config(route_name="blank_label")
-    def blank_label(self):
-        """ Match a route without the serial in matchdict, return the
-        placeholder image.
-        """
-        log.info("Return blank label")
-        return FileResponse("resources/example_qr_label.png")
-
     @view_config(route_name="show_label")
     def show_label(self):
         """ Return the specified file based on the matchdict serial
         parameter, or the placeholder image if not found.
         """
-        serial = self.request.matchdict["serial"]
-        filename = "label_files/%s/label.png" % slugify(serial)
-
-        if not os.path.exists(filename):
-            filename = "resources/example_qr_label.png"
-
+        serial = slugify(self.request.matchdict["serial"])
+        filename = "label_files/%s/label.png" % serial
         return FileResponse(filename)
 
     @view_config(route_name="qr_label", renderer="templates/qr_form.pt")
@@ -102,52 +90,34 @@ class LabelViews(object):
         """ Process form parameters, create a qr code or return an empty
         form.
         """
-
-        schema = StickerSchema()
-        form = Form(schema, buttons=("submit",))
-        local = self.empty_form()    
+        form = Form(StickerSchema(), buttons=("submit",))
 
         if "submit" in self.request.POST:
+            log.info("submit: %s", self.request.POST)
+            controls = self.request.POST.items()
             try:
-                # Deserialize into hash on validation - capture is the
-                # appstruct in deform land
-                controls = self.request.POST.items()
-                captured = form.validate(controls)
+                appstruct = form.validate(controls)
+                rendered_form = form.render(appstruct)
 
-                # Populate local data structure with deserialized data
-                local.serial = captured["serial"]
-                local.domain = captured["domain"]
-                local.slugged = slugify(local.serial)
+                self.write_optional_uploads(appstruct)
+                self.check_background_size(appstruct)
+                self.build_qr_label(appstruct) 
 
-                # file not required
-                if captured["upload"] == colander.null:
-                    local.filename = "using default"
-                else:
-                    local.filename = captured["upload"]["filename"]
-                    local.upload = captured["upload"]
-                    self.write_file(local)
-                    self.check_file_size(local)
+                return {"form":rendered_form, "appstruct":appstruct}
 
-                # build the qr label
-                self.build_qr_label(local) 
-
-                # Re-render the form with the fields already populated 
-                return dict(data=local, form=form.render(captured))
-                
-            except ValidationFailure as exc:
+            except ValidationFailure as exc: 
                 #log.exception(exc)
-                log.critical("Validation failure, return default form")
-                return dict(data=local, form=exc.render())
+                log.info("Validation failure")
+                return {'form':exc.render()} 
 
-        return dict(data=local, form=form.render())
+        return {"form":form.render()}
 
-    def build_qr_label(self, local):
+    def build_qr_label(self, appstruct):
         """ Create the label_files sub directory on disk if required, then
         generate the qr label and save it in the directory.
         """
-        serial = slugify(local.serial)
+        serial = slugify(appstruct["serial"])
         dir_name = "label_files/%s" % serial
-        filename = "label_files/%s/label.png" % serial
         if os.path.exists(dir_name):
             log.info("Path exists: %s", dir_name)
         else:
@@ -155,19 +125,24 @@ class LabelViews(object):
 
         # Render with the custom uploaded background if it exists
         back_name = "%s/custom_background.png" % dir_name
+        filename = "label_files/%s/label.png" % serial
         if os.path.exists(back_name):
-            lbl = QL700Label(filename=filename, serial=local.serial,
-                             domain=local.domain, base_img=back_name)
+            lbl = QL700Label(filename=filename,
+                             serial=appstruct["serial"],
+                             domain=appstruct["domain"], 
+                             base_img=back_name)
         else:
-            lbl = QL700Label(filename=filename, serial=local.serial,
-                             domain=local.domain)
+            lbl = QL700Label(filename=filename,
+                             serial=appstruct["serial"],
+                             domain=appstruct["domain"])
+                
         log.info("Label generated [%s]", lbl)
 
-    def check_file_size(self, upload_obj):
+    def check_background_size(self, appstruct):
         """ If a custom_background image for that serial number exists
         on disk, delete it if it is the wrong size.
         """
-        final_dir = "label_files/%s" % slugify(upload_obj.serial)
+        final_dir = "label_files/%s" % slugify(appstruct["serial"])
         img_file = "%s/custom_background.png" % final_dir
         if os.path.exists(img_file): 
             img = Image.open(img_file)
@@ -176,30 +151,33 @@ class LabelViews(object):
                 log.critical("Wrong file size: %s, %s", width, height)
                 os.remove(img_file)
 
-
-    def write_file(self, upload_obj):
-        """ With file from the post request, write to a temporary file,
-        then ultimately to the destination specified.
+    def write_optional_uploads(self, appstruct):
+        """ With parameters in the post request, create a destination
+        directory then write the uploaded file to a hardcoded filename.
         """
-        temp_file = "label_files/temp_file"
 
-        upload_file = upload_obj.upload["fp"]
-        upload_file.seek(0)
-        with open(temp_file, "wb") as output_file:
-            shutil.copyfileobj(upload_file, output_file)
-
-        # Create the directory if it does not exist
-        final_dir = "label_files/%s" % slugify(upload_obj.serial)
+        if appstruct.get("upload") is colander.null:
+            log.info("No file submitted for background")
+            return
+ 
+        final_dir = "label_files/%s" % slugify(appstruct["serial"])
         if not os.path.exists(final_dir):
             log.info("Make directory: %s", final_dir)
             os.makedirs(final_dir)
 
         final_file = "%s/custom_background.png" % final_dir
+        file_pointer = appstruct["upload"]["fp"]
+        self.single_file_write(file_pointer, final_file)
 
-        os.rename(temp_file, final_file)
-        log.info("Saved file: %s", final_file)
-
-    def empty_form(self):
-        """ Populate an empty form object, return to web app.
+    def single_file_write(self, file_pointer, filename):
+        """ Read from the file pointer, write intermediate file, and
+        then copy to final destination.
         """
-        return StickerForm()
+        temp_file = "resources/temp_file"
+
+        file_pointer.seek(0)
+        with open(temp_file, "wb") as output_file:
+            shutil.copyfileobj(file_pointer, output_file)
+
+        os.rename(temp_file, filename)
+        log.info("Saved file: %s", filename) 

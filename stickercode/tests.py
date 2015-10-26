@@ -60,18 +60,18 @@ class TestStickerGenerator(unittest.TestCase):
         fail_serial = "aserialnumberthatiswaytoolongtotriggerfailures"
         self.assertRaises(TypeError, QL700Label, serial=fail_serial)
 
-
-class MockFieldStorage(object):
+class DeformMockFieldStorage(object):
     """ Create a storage object that references a file for use in
-    view unittests.
+    view unittests. Deform/colander requires a dictionary to address the
+    multiple upload fields. This is not required for 'plain' html file
+    uploads.
     """
     def __init__(self, source_file_name):
         self.filename = source_file_name
         self.file = file(self.filename)
-        # type and length are to address the requirements of the
-        # deform/colander validations
         self.type = "file"
         self.length = os.path.getsize(self.filename)
+
 
 class TestStickerCodeViews(unittest.TestCase):
     def setUp(self):
@@ -98,227 +98,134 @@ class TestStickerCodeViews(unittest.TestCase):
         request = testing.DummyRequest()
         inst = LabelViews(request)
         result = inst.qr_label()
-
-        data = result["data"]
-        self.assertEqual(data.serial, "")
-        self.assertEqual(data.domain, "https://waspho.com")
-        self.assertEqual(data.filename, "")
-
-    def test_post_no_image_returns_populated(self):
+        self.assertIsNone(result.get("appstruct"))
+        
+    def test_serial_missing_or_empty_is_failure(self):
         from stickercode.views import LabelViews
 
-        # Submitting with no upload field is valid - view will use the
-        # default background image
-        test_serial = "FT1234" 
-        new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com",}
-
-        request = testing.DummyRequest(new_dict)
+        post_dict = {"submit":"submit"}
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
+        self.assertIsNone(result.get("appstruct")) 
 
-        data = result["data"]
-        self.assertEqual(data.serial, test_serial)
-        self.assertEqual(data.domain, "https://waspho.com")
-        self.assertEqual(data.filename, "using default")
-
-    def test_post_with_image_returns_populated_data(self):
-        from stickercode.views import LabelViews
-
-        # deform/colander requires a dictionary to address the multiple
-        # upload fields. This is not required for 'plain' html file
-        # uploads
-        fname = "resources/known_example.png"
-        img_back = MockFieldStorage(fname)
-        upload_dict = {"upload":img_back}
- 
-        test_serial = "FT1234" 
-        new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com",
-                    "upload":upload_dict} 
-        request = testing.DummyRequest(new_dict)
+        post_dict = {"submit":"submit", "serial":""}
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
+        self.assertIsNone(result.get("appstruct")) 
 
-        data = result["data"]
-        self.assertEqual(data.serial, test_serial)
-        self.assertEqual(data.domain, "https://waspho.com")
-        self.assertEqual(data.filename, fname)
-
-    def test_post_invalid_serial(self):
-        # specify an invalid serial number, verify the form is populated
-        # with the invalid values
+    def test_domain_missing_or_empty_is_failure(self):
         from stickercode.views import LabelViews
 
-        test_serial = ""
-        new_dict = {"submit":"True", "serial":test_serial}
-        request = testing.DummyRequest(new_dict)
+        post_dict = {"submit":"submit", "serial":"UT5555"}
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
+        self.assertIsNone(result.get("appstruct")) 
 
-        data = result["data"]
-        self.assertEqual(data.serial, test_serial)
-
-    def test_post_domain(self):
-        # Specify a valid serial number, make sure the url validator on
-        # the domain field is active
-        from stickercode.views import LabelViews
-
-        # submitting an invalid domain gets you the default domain back
-        test_domain = ""
-        new_dict = {"submit":"True", "serial":"UT5555", 
-                    "domain":test_domain}
-        request = testing.DummyRequest(new_dict)
+        post_dict = {"submit":"submit", "serial":"UT5555",
+                     "domain":""}
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
+        self.assertIsNone(result.get("appstruct")) 
 
-        data = result["data"]
-        self.assertEqual(data.domain, "https://waspho.com")
+    def test_malformed_domain_is_failure(self):
+        from stickercode.views import LabelViews
 
-        # submitting a valid domain gets the same domain back
-        test_domain = "http://example.com"
-        new_dict = {"submit":"True", "serial":"UT5555", 
-                    "domain":test_domain}
-        request = testing.DummyRequest(new_dict)
+        bad_domains = ["http://", "http", "htt p://waspho.com", ".com"]
+        for item in bad_domains:
+            post_dict = {"submit":"submit", "serial":"UT5555",
+                        "domain":item}
+            request = testing.DummyRequest(post_dict)
+            inst = LabelViews(request)
+            result = inst.qr_label()
+            self.assertIsNone(result.get("appstruct")) 
+
+
+    def test_serial_and_domain_is_passing(self):
+        from stickercode.views import LabelViews
+
+        post_dict = {"submit":"submit", "serial":"UT5555",
+                     "domain":"https://waspho.com"}
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
+        self.assertIsNotNone(result.get("appstruct"))
 
-        data = result["data"]
-        self.assertEqual(data.domain, test_domain)
-        
-
-    def test_serialless_route_to_placeholder(self):
-        # If the blank_label view is requested, always return
-        # placeholder file
-        from stickercode.views import LabelViews
-
-        request = testing.DummyRequest()
-        inst = LabelViews(request)
-        result = inst.blank_label()
-        
-        self.assertEqual(result.content_length, 32743)
-
-    def test_view_unknown_serial_returns_placeholder(self):
-        from stickercode.views import LabelViews
-
-        # No serial should raise exception
-        request = testing.DummyRequest()
-        inst = LabelViews(request)
-        self.assertRaises(KeyError, inst.show_label) 
-
-        # If the specified serial is blank or not found, return the
-        # placeholder image
-        request = testing.DummyRequest()
-        request.matchdict["serial"] = ""
-        inst = LabelViews(request)
-        result = inst.show_label()
-        
-        self.assertEqual(result.content_length, 32743)
-
-    def test_view_known_generated_label(self):
-        from stickercode.views import LabelViews
-        
-        # copy a known image into the label_file folder, make sure the get
-        # sizes match
-
-        test_serial = slugify("UT5555")
-        dir_out = "label_files/%s/" % test_serial
-       
-        os.makedirs(dir_out)
-        
-        source_file = "resources/known_example.png"
-        dest_file = "%s/label.png" % dir_out
-
-        shutil.copy(source_file, dest_file) 
-        self.assertTrue(os.path.exists(dest_file))
-        
-        request = testing.DummyRequest()
-        request.matchdict["serial"] = test_serial
-        inst = LabelViews(request)
-        result = inst.show_label()
-        
-        self.assertTrue(size_range(result.content_length, 39610))
-        
-    def test_post_generates_label_on_disk(self):
+    def test_post_with_image_creates_hardcoded_filename(self):
         from stickercode.views import LabelViews
     
-        # POST to create a qr file, verify it exists on the disk
-        test_serial = "UT0001" 
-        new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com/"} 
-        request = testing.DummyRequest(new_dict)
+        png_name = "resources/inverted_wasatch.png"
+        png_file = DeformMockFieldStorage(png_name)
+        png_upload_dict = {"upload":png_file}
+ 
+        post_dict = {"submit":"submit", "serial":"UT5555",
+                     "domain":"https://waspho.com",
+                     "upload":png_upload_dict}
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
+        
+        dest_top = "label_files/ut5555/custom_background.png"
+        self.assertTrue(file_range(dest_top, 63692))
 
-        # Verify the file exists on disk
-        slug_serial = slugify(test_serial)
-        dest_file = "label_files/%s/label.png" % slug_serial
-        self.assertTrue(file_range(dest_file, 15337))
+    def test_post_fully_populated_creates_hardcoded_filename(self):
+        from stickercode.views import LabelViews
 
-        # verify the view returns it
+        post_dict = {"submit":"submit", "serial":"UT5555",
+                     "domain":"https://waspho.com"}
+        request = testing.DummyRequest(post_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+        
+        dest_file = "label_files/ut5555/label.png"
+        self.assertTrue(file_range(dest_file, 15118))
+
+    def test_post_fully_populated_sticker_view_accessible(self):
+        from stickercode.views import LabelViews
+
+        post_dict = {"submit":"submit", "serial":"UT5555",
+                     "domain":"https://waspho.com"}
+        request = testing.DummyRequest(post_dict)
+        inst = LabelViews(request)
+        result = inst.qr_label()
+       
         request = testing.DummyRequest()
-        request.matchdict["serial"] = test_serial
+        request.matchdict["serial"] = "UT5555"
         inst = LabelViews(request)
         result = inst.show_label()
-        self.assertTrue(size_range(result.content_length, 15337))
-       
-    def test_post_with_image_generates_label_on_disk(self):
+
+        file_size = result.content_length
+        self.assertTrue(size_range(file_size, 15118))
+
+    def test_unknown_sticker_serial_view_is_failure(self):
         from stickercode.views import LabelViews
-    
-        # POST without the image specified, verify the file exists on
-        # disk 
-        test_serial = "UT0001" 
-        new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com/"} 
-        request = testing.DummyRequest(new_dict)
+
+        request = testing.DummyRequest()
+        request.matchdict["serial"] = "badSerial1"
         inst = LabelViews(request)
-        result = inst.qr_label()
+        self.assertRaises(OSError, inst.show_label)
 
-        slug_serial = slugify(test_serial)
-        dest_file = "label_files/%s/label.png" % slug_serial
-        self.assertTrue(file_range(dest_file, 15337))
-
-
-        # POST with the custom background image, verify the file
-        # exists
-        fname = "resources/inverted_wasatch.png"
-        img_back = MockFieldStorage(fname)
-        upload_dict = {"upload":img_back}
- 
-        test_serial = "UT0001" 
-        new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com/",
-                    "upload":upload_dict
-                   } 
-        request = testing.DummyRequest(new_dict)
-        inst = LabelViews(request)
-        result = inst.qr_label()
-
-        slug_serial = slugify(test_serial)
-        dest_file = "label_files/%s/label.png" % slug_serial
-        self.assertTrue(file_range(dest_file, 62250, ok_range=1000))
-
-    def test_post_with_invalid_image_size_uses_default(self):
+    def test_post_with_invalid_background_size_uses_default(self):
         from stickercode.views import LabelViews
         
-        # POST with an image that does not have the required dimensions,
-        # verify that it has the same content as the default image 
-        fname = "resources/wrong_size_wasatch.png"
-        img_back = MockFieldStorage(fname)
-        upload_dict = {"upload":img_back}
+    
+        png_name = "resources/wrong_size_wasatch.png"
+        png_file = DeformMockFieldStorage(png_name)
+        png_upload_dict = {"upload":png_file}
  
-        test_serial = "UT0001" 
-        new_dict = {"submit":"True", "serial":test_serial,
-                    "domain":"https://waspho.com/",
-                    "upload":upload_dict
-                   } 
-        request = testing.DummyRequest(new_dict)
+        post_dict = {"submit":"submit", "serial":"UT5555",
+                     "domain":"https://waspho.com",
+                     "upload":png_upload_dict}
+
+        request = testing.DummyRequest(post_dict)
         inst = LabelViews(request)
         result = inst.qr_label()
 
-        slug_serial = slugify(test_serial)
-        dest_file = "label_files/%s/label.png" % slug_serial
-        self.assertTrue(file_range(dest_file, 15337))
+        dest_file = "label_files/ut5555/label.png"
+        self.assertTrue(file_range(dest_file, 15118))
 
         
 class FunctionalTests(unittest.TestCase):

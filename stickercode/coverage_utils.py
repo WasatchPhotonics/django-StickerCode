@@ -2,6 +2,9 @@
 """
 
 import os
+import logging
+
+log = logging.getLogger(__name__)
 
 def touch_erase(filename):
     """ Helper function to erase a file if it exists. Touches the
@@ -25,11 +28,16 @@ def file_range(filename, expected_size, ok_range=50):
     difference in file size.
     """
     if not os.path.exists(filename):
+        log.info("file does not exist: %s", filename)
         return False
 
     actual_size = os.path.getsize(filename)
-
-    return size_range(actual_size, expected_size, ok_range)
+    result = size_range(actual_size, expected_size, ok_range)
+    if not result:
+        log.info("Size out of range: %s, %s, %s" \
+                 % (actual_size, expected_size, ok_range))
+        
+    return result
 
 def size_range(actual_size, expected_size, ok_range=50):
     """ Simple comparison of two size ranges.
