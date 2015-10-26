@@ -52,5 +52,3 @@ def size_range(actual_size, expected_size, ok_range=50):
         return False
 
     return True
-
-    

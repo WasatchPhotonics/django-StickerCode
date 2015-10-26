@@ -46,7 +46,7 @@ class LabelViews(object):
         form = Form(StickerSchema(), buttons=("submit",))
 
         if "submit" in self.request.POST:
-            log.info("submit: %s", self.request.POST)
+            #log.info("submit: %s", self.request.POST)
             controls = self.request.POST.items()
             try:
                 appstruct = form.validate(controls)
