@@ -39,6 +39,18 @@
     <meta name="msapplication-TileImage" content="assets/img/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
+        <!-- CSS -->
+        <link rel="stylesheet" href="assets/css/pygments.css" type="text/css">
+        <link rel="stylesheet" href="assets/css/form.css" type="text/css">
+        <link rel="stylesheet" href="assets/css/bootstrap.css" type="text/css" media="screen" charset="utf-8">
+
+    <script type="text/javascript" src="assets/js/jquery-2.0.3.min.js"></script>
+    <!--<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>-->
+    <script type="text/javascript" src="assets/js/deform.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.form-3.09.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.maskedinput-1.3.1.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
     <script>
       function fadeIn(obj) {
           $(obj).fadeIn(1000);
@@ -53,7 +65,7 @@
         <div class="container-fluid">
           <div class="navbar-header">
             <a class="navbar-brand" href="#">
-              <img alt="Brand" src="${request.static_url('stickercode:assets/img/favicon-32x32.png')}">
+              <img alt="Brand" src="/assets/img/favicon-32x32.png">
               <a class="navbar-brand" href="#">StickerCode Web application</a>
             </a>
           </div>
@@ -61,7 +73,7 @@
       </nav>
 
       <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-3">
           <div class="panel panel-primary">
             <div class="panel-heading">
               <h3 class="panel-title">Enter parameters</h3>
@@ -72,10 +84,10 @@
           </div>
         </div>
 
-        <div class="col-md-4">
-          <div class="panel panel-success">
+        <div class="col-md-8">
+          <div class="panel panel-info">
             <div class="panel-heading">
-              <h3 class="panel-title">Top</h3>
+              <h3 class="panel-title">Generated QR Label</h3>
             </div>
             <div class="panel-body">
               <div>
@@ -93,10 +105,17 @@
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+    <!-- Use a exactly specified versions by deform for compatibility -->
+        
+
     <!-- Include all compiled plugins (below), or include individual
          files as needed -->
-    <script src="assets/js/bootstrap.min.js"></script>
+    
+        <script type="text/javascript">
+            deform.load()
+        </script>
+        
   </body>
 </html>
 
