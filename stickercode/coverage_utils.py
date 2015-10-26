@@ -34,8 +34,8 @@ def file_range(filename, expected_size, ok_range=50):
     actual_size = os.path.getsize(filename)
     result = size_range(actual_size, expected_size, ok_range)
     if not result:
-        log.info("Size out of range: %s, %s, %s" \
-                 % (actual_size, expected_size, ok_range))
+        log.info("Size out of range: %s, %s, %s", \
+                 actual_size, expected_size, ok_range)
         
     return result
 

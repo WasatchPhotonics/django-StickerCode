@@ -12,7 +12,7 @@ from slugify import slugify
 
 from pyramid import testing
 
-from webtest import TestApp
+from webtest import TestApp, Upload
 
 from stickercode.coverage_utils import touch_erase
 from stickercode.coverage_utils import size_range, file_range
@@ -34,7 +34,7 @@ class TestCoverageUtils(unittest.TestCase):
         self.assertFalse(file_range(filename, 10000))
 
     def test_file_sizes_out_of_range(self):
-        filename = "resources/example_qr_label.png"
+        filename = "stickercode/assets/img/example_qr_label.png"
         # Too small with default range 50
         self.assertFalse(file_range(filename, 30000))
         # Too big
@@ -137,7 +137,7 @@ class TestStickerCodeViews(unittest.TestCase):
         bad_domains = ["http://", "http", "htt p://waspho.com", ".com"]
         for item in bad_domains:
             post_dict = {"submit":"submit", "serial":"UT5555",
-                        "domain":item}
+                         "domain":item}
             request = testing.DummyRequest(post_dict)
             inst = LabelViews(request)
             result = inst.qr_label()
@@ -230,6 +230,7 @@ class TestStickerCodeViews(unittest.TestCase):
         
 class FunctionalTests(unittest.TestCase):
     def setUp(self):
+        self.clean_test_files()
         from stickercode import main
         settings = {}
         app = main({}, **settings)
@@ -238,34 +239,68 @@ class FunctionalTests(unittest.TestCase):
     def tearDown(self):
         del self.testapp
 
-    def test_get_form_view(self):
+    def clean_test_files(self):
+        # Remove the directory if it exists
+        test_serials = ["ft789"]
+
+        for item in test_serials:
+            dir_out = "thumbnails/%s" % slugify(item)
+            if os.path.exists(dir_out):
+                shutil.rmtree(dir_out)
+
+    def test_home_form_starts_empty_placeholders_visible(self):
         res = self.testapp.get("/")
         self.assertEqual(res.status_code, 200)
 
         form = res.forms["deform"]
         self.assertEqual(form["serial"].value, "")
-        self.assertEqual(form["domain"].value, "https://waspho.com")
-        self.assertEqual(form["upload"].value, "")
 
-        self.assertTrue("src=\"/show_label" in res.body)
+        indexed_form_name = form.get("upload", 0).name
+        self.assertEqual(indexed_form_name, "upload")
 
-    def test_post_form_returns_populated_data(self):
-        ft_serial = "FT7890"
-        ft_domain = "https://waspho.com"
+        match_example = "assets/img/example_qr_label.png"
+        self.assertTrue(match_example in res.body)
 
+    def test_imagery_placeholder_is_accessible(self):
+        res = self.testapp.get("/assets/img/example_qr_label.png")
+        self.assertEqual(res.status_code, 200)
+
+    def test_submit_with_no_values_has_error_messages(self):
         res = self.testapp.get("/")
         form = res.forms["deform"]
-        form["serial"] = ft_serial
-        form["domain"] = ft_domain
-
         submit_res = form.submit("submit")
-        new_form = submit_res.forms["deform"]
-        self.assertEqual(new_form["serial"].value, ft_serial)
-        self.assertEqual(new_form["domain"].value, ft_domain)
+        self.assertTrue("was a problem with your" in submit_res.body) 
 
-        # Re-submit to make sure the directory is not overwritten for
-        # coverage
+    def test_submit_with_serial_but_no_domain_has_error_message(self):
+        res = self.testapp.get("/")
+        form = res.forms["deform"]
+        form["serial"] = "okserial"
+        form["domain"] = ""
         submit_res = form.submit("submit")
-        new_form = submit_res.forms["deform"]
-        self.assertEqual(new_form["serial"].value, ft_serial)
-        self.assertEqual(new_form["domain"].value, ft_domain)
+        self.assertTrue("was a problem with your" in submit_res.body) 
+
+    def test_submit_with_all_values_has_no_error_messages(self):
+        res = self.testapp.get("/")
+        form = res.forms["deform"]
+        form["serial"] = "ft789"
+        form["domain"] = "https://functional.com"
+        form.set("upload", Upload("resources/wasatch.png"), 0)
+        submit_res = form.submit("submit")
+        self.assertTrue("was a problem with" not in submit_res.body)
+
+    def test_submit_with_all_values_image_links_available(self):
+        res = self.testapp.get("/")
+        form = res.forms["deform"]
+        form["serial"] = "ft789"
+        form["domain"] = "https://functional.com"
+        form.set("upload", Upload("resources/wasatch.png"), 0)
+        submit_res = form.submit("submit")
+        self.assertTrue("was a problem with" not in submit_res.body)
+
+        top_link = "src=\"/show_label/ft789"
+        self.assertTrue(top_link in submit_res.body)
+ 
+        res = self.testapp.get("/show_label/ft789")
+        img_size = res.content_length
+        self.assertTrue(size_range(img_size, 15695, ok_range=5000))
+        
