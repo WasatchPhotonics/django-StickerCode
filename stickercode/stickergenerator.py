@@ -16,7 +16,8 @@ class QL700Label(object):
     """
     def __init__(self, filename="ql700_label.png", serial="EX-0158",
                  domain="https://waspho.com", 
-                 base_img="resources/wasatch.png"):
+                 base_img="resources/wasatch.png",
+                 return_blob=False):
         self.filename = filename
         self.serial = serial
         self.domain = domain
@@ -38,6 +39,17 @@ class QL700Label(object):
 
         self.generate_qr_image()
         self.build_png()
+        if not return_blob:
+            self.save_png()
+        
+    def return_blob(self):
+        """ API compatibility to return generated blob data from qr
+        label without writing to disk.
+        """
+        self.back_img.save("temp_file.png")
+        self.back_img.close()
+        temp_file = open("temp_file.png")
+        return temp_file.read()
 
     def generate_qr_image(self):
         """ Use pyqrnative to build a qr image, and save to disk.
@@ -60,8 +72,8 @@ class QL700Label(object):
         """
 
         # Open the base image, draw text
-        back_img = Image.open(self.base_img)
-        txt_draw = ImageDraw.Draw(back_img)
+        self.back_img = Image.open(self.base_img)
+        txt_draw = ImageDraw.Draw(self.back_img)
         font = ImageFont.truetype(self.font_sans, 30)
 
         dtxt = "%s/" % self.domain
@@ -72,6 +84,11 @@ class QL700Label(object):
 
         # Composite over the generated qr code
         qr_img = Image.open("resources/temp_qr.png")
-        back_img.paste(qr_img, (730, 0))
+        self.back_img.paste(qr_img, (730, 0))
 
-        back_img.save(self.filename)
+
+    def save_png(self):
+        """ Write the in-memory png to disk.
+        """
+        self.back_img.save(self.filename)
+        

@@ -60,6 +60,16 @@ class TestStickerGenerator(unittest.TestCase):
         fail_serial = "aserialnumberthatiswaytoolongtotriggerfailures"
         self.assertRaises(TypeError, QL700Label, serial=fail_serial)
 
+    def test_with_parameters_returns_blob(self):
+        from stickercode.stickergenerator import QL700Label
+        filename = "ql700_label.png"
+        touch_erase(filename)
+
+        lbl = QL700Label(return_blob=True).return_blob()
+    
+        self.assertTrue(size_range(len(lbl), 16098, ok_range=500))
+
+
 class DeformMockFieldStorage(object):
     """ Create a storage object that references a file for use in
     view unittests. Deform/colander requires a dictionary to address the
