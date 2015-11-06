@@ -2,6 +2,7 @@
 design for wasatch photonics device labeling.
 """
 
+import os
 import logging
 
 import PyQRNative
@@ -21,12 +22,16 @@ class QL700Label(object):
         self.filename = filename
         self.serial = serial
         self.domain = domain
-        self.base_img = base_img
+        self.dir_name = os.path.dirname(__file__)
+        self.base_img = "%s/../%s" % (self.dir_name, base_img)
         self.link_txt = "%s/%s" % (self.domain, self.serial)
 
-        self.font_sans = "resources/libsansreg.ttf"
-        self.font_reg = "resources/libmonoreg.ttf"
-        self.font_bold = "resources/libmonobold.ttf"
+        self.font_sans = "%s/../resources/libsansreg.ttf" \
+                         % self.dir_name
+        self.font_reg = "%s/../resources/libmonoreg.ttf" \
+                         % self.dir_name
+        self.font_bold = "%s/../resources/libmonobold.ttf" \
+                         % self.dir_name
 
         min_length = 4
         max_length = 33
@@ -62,7 +67,8 @@ class QL700Label(object):
         qr_image = pyqr.makeImage()
 
         # Resize the image so it first nicely on the graphic
-        img_file = open("resources/temp_qr.png", "wb")
+        img_file = open("%s/../resources/temp_qr.png" \
+                        % self.dir_name, "wb")
         qr_image = qr_image.resize((320, 320))
         qr_image.save(img_file, 'PNG')
         img_file.close()
@@ -84,7 +90,8 @@ class QL700Label(object):
         txt_draw.text((410, 198), self.serial, font=bold_font)
 
         # Composite over the generated qr code
-        qr_img = Image.open("resources/temp_qr.png")
+        qr_img = Image.open("%s/../resources/temp_qr.png" \
+                            % self.dir_name)
         self.back_img.paste(qr_img, (730, 0))
 
 
