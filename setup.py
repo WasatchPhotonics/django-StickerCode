@@ -21,7 +21,6 @@ requires = [
     "WebTest",
     "requests",
     "python-slugify",
-    "PyQRNative",
     "pillow",
     "deform",
     "nose",
