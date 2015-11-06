@@ -44,7 +44,8 @@ class QL700Label(object):
         
     def return_blob(self):
         """ API compatibility to return generated blob data from qr
-        label without writing to disk.
+        label without writing to disk. If you have a solution with
+        tobytes, bytesio and encoder_name, please let me know.
         """
         self.back_img.save("temp_file.png")
         self.back_img.close()
