@@ -21,6 +21,7 @@ Full installation prerequisites for Fedora Core 22:
     sudo dnf install gcc
     sudo dnf install libjpeg-devel
     sudo dnf install zlib-devel
+    sudo dnf install ImageMagick-devel
 
     git clone https://github.com/WasatchPhotonics/pyqrnative
     cd pyqrnative
