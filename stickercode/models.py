@@ -23,11 +23,11 @@ class StickerSchema(colander.Schema):
     a deform object.
     """
     serial = colander.SchemaNode(colander.String(),
-                                 validator=colander.Length(3, 10))
+                                 validator=colander.Length(3, 15))
 
     domain = colander.SchemaNode(colander.String(),
                                  validator=colander.url,
-                                 default="https://waspho.com")
+                                 default="http://waspho.com")
 
     # Based on: # http://stackoverflow.com/questions/6563546/\
     # how-to-make-file-upload-facultative-with-deform-and-colander

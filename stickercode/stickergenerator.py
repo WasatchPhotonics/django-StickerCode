@@ -16,7 +16,7 @@ class QL700Label(object):
     default. All parameters are optional.
     """
     def __init__(self, filename="ql700_label.png", serial="EX-0158",
-                 domain="https://waspho.com", 
+                 domain="http://waspho.com", 
                  base_img="resources/wasatch.png",
                  return_blob=False):
         self.filename = filename
@@ -87,7 +87,7 @@ class QL700Label(object):
         txt_draw.text((145, 205), dtxt, font=font)
 
         bold_font = ImageFont.truetype(self.font_bold, 40)
-        txt_draw.text((410, 198), self.serial, font=bold_font)
+        txt_draw.text((395, 198), self.serial, font=bold_font)
 
         # Composite over the generated qr code
         qr_img = Image.open("%s/../resources/temp_qr.png" \
