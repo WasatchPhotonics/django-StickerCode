@@ -47,7 +47,7 @@ class TestStickerGenerator(unittest.TestCase):
         touch_erase(filename)
 
         lbl = QL700Label()
-        self.assertTrue(file_range(filename, 16098))
+        self.assertTrue(file_range(filename, 16098, ok_range=1000))
 
     def test_length_within_range(self):
         from stickercode.stickergenerator import QL700Label
