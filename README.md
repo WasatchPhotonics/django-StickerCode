@@ -28,6 +28,20 @@ Full installation prerequisites for Fedora Core 22:
     $VENV/bin/python setup.py install
 
 
+Conda Installation and tests
+----------------------------
+    conda create -n cookbook pyramid
+    source activate cookbook
+    conda install pillow pytest-cov
+
+    git clone https://github.com/WasatchPhotonics/pyqrnative
+    cd pyqrnative
+    $VENV/bin/python setup.py install
+
+
+Setup and Tests
+---------------
+
 - cd _directory containing this file_
 
 - $VENV/bin/python setup.py develop
