@@ -14,7 +14,9 @@ PyQRNative is required. Use the fork here:
 https://github.com/WasatchPhotonics/pyqrnative for a typo correction on
 linux.
 
-Full installation prerequisites for Fedora Core 22:
+
+VirtualEnv Installation
+-----------------------
 
     Create a python virtual environment
     sudo dnf install freetype-devel
@@ -28,7 +30,7 @@ Full installation prerequisites for Fedora Core 22:
     $VENV/bin/python setup.py install
 
 
-Conda Installation and tests
+Conda Installation
 ----------------------------
     conda create -n cookbook pyramid
     source activate cookbook
